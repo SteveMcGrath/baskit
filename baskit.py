@@ -7,6 +7,7 @@ import datetime
 import time
 import sys
 import re
+import getopt
 from ConfigParser import ConfigParser
 from commands import getoutput as run
 
