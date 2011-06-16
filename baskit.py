@@ -404,10 +404,12 @@ class Baskit(cmd.Cmd):
       backup = os.path.join(env, 'backup', 'worlds', '%s.bck' % name)
       path = os.path.join(env, 'env', world)
       print 'Generating Backup of %s named %s...' % (world, name)
-      console('save-all')
-      console('save-off')
+      if alive():
+        console('save-all')
+        console('save-off')
       run('tar czvf %s -C %s' % (backup, path))
-      console('save-on')
+      if alive():
+        console('save-on')
       print 'Backup created.'
 
 if __name__ == '__main__':
