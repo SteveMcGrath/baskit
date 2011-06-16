@@ -202,15 +202,15 @@ class Baskit(cmd.Cmd):
       try:
         print 'Downloading craftbukkit to temporary location...'
         cb_bin = urllib2.urlopen(url + artifact).read()
-        cb_tmp = open(os.path.join(env, '.craftbukkit.jar'), 'wb')
+        cb_tmp = open(os.path.join(env, 'env', '.craftbukkit.jar'), 'wb')
         cb_tmp.write(cb_bin)
         cb_tmp.close()
       except:
         print 'ERROR: Could not successfully save binary!'
         return False
       print 'Moving new binary into place...'
-      shutil.move(os.path.join(env, '.craftbukkit.jar'),
-                  os.path.join(env, 'craftbukkit.jar'))
+      shutil.move(os.path.join(env, 'env', '.craftbukkit.jar'),
+                  os.path.join(env, 'env', 'craftbukkit.jar'))
       print 'Updating configuration...'
       config.set('Settings', 'build', build)
       config.set('Settings', 'branch', branch)
