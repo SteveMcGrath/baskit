@@ -52,6 +52,7 @@ def console(command):
 class Baskit(cmd.Cmd):
   def __init__(self):
     cmd.Cmd.__init__(self)
+    get_config()
     self.env = config.get('Settings', 'environment')
     # Create any needed folders if they do not already exist.
     if not os.path.exists(self.env):
