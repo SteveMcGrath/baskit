@@ -56,6 +56,7 @@ def console(command):
     run('screen -S bukkit_server -p0 -X stuff \'%s\n\'' % command)
 
 class Baskit(cmd.Cmd):
+  prompt = 'baskit> '
   def __init__(self):
     cmd.Cmd.__init__(self)
     get_config()
