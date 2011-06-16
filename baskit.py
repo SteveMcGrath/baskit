@@ -32,6 +32,7 @@ def get_config():
     config.set('Settings', 'branch', 'stable')
     config.set('Settings', 'memory', '1024')
     config.set('Settings', 'flags', '')
+    conf_loc = 'baskit.ini'
     update_config()
 
 def update_config():
