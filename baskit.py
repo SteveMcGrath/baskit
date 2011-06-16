@@ -171,7 +171,7 @@ class Baskit(cmd.Cmd):
      'stable': '%s/promotion/latest/Recommended' % ci,
      'test': '%s/lastStableBuild' % ci,
      'dev': '%s/lastSuccessfulBuild' % ci,
-     'build': '%s/' % ci
+     'build': '%s/{BUILD}' % ci
     }
     opts, args  = getopt.getopt(s.split(), 'b:dtsf',
                                 ['build=','dev', 'test', 'stable', 'force'])
