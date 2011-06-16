@@ -5,6 +5,7 @@ import shutil
 import os
 import datetime
 import time
+import sys
 from ConfigParser import ConfigParser
 from commands import getoutput as run
 
