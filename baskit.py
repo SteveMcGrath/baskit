@@ -9,10 +9,13 @@ import sys
 from ConfigParser import ConfigParser
 from commands import getoutput as run
 
-config = ConfigParser()
-conf_loc = None
+global config
+global conf_loc
 
 def get_config():
+  global config
+  global conf_loc
+  config = ConfigParser()
   cf_locs = ['/etc/baskit.ini', '~/.baskit.ini', 'baskit.ini']
   for cf_loc in cf_locs:
     if os.path.exists(cf_loc) and not config.has_section('Settings'):
@@ -36,6 +39,7 @@ def get_config():
     update_config()
 
 def update_config():
+  global conf_loc
   with open(conf_loc, 'wb') as configfile:
     config.write(configfile)
 
@@ -152,6 +156,7 @@ class Baskit(cmd.Cmd):
     -f (--force)                  Forces the update, even if the build is
                                   older than the current binary.
     '''
+    global config
     force = False
     env = config.get('Settings', 'environment')
     branch = config.get('Settings', 'branch')
@@ -288,6 +293,7 @@ class Baskit(cmd.Cmd):
                                     bukkit-[DATE]-[BUILD].snap
     -r (--restore) [NAME]         Restores a snapshot.
     '''
+    global config
     env = config.get('Settings', 'environment')
     worlds = []
     desc = None
