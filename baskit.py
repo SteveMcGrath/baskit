@@ -14,6 +14,10 @@ from commands import getoutput as run
 config = ConfigParser()
 conf_loc = None
 
+if sys.version_info < (2, 6):
+  print "This script requires python version 2.6 or greater."
+  sys.exit(1)
+
 def get_config():
   global config
   global conf_loc
