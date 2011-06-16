@@ -262,13 +262,14 @@ class Baskit(cmd.Cmd):
     '''start
     Starts the bukkit server.
     '''
+    env = os.path.join(config.get('Settings', 'environment'), 'env')
     java = run('which java')
     startup = '%s %s -Xms%sm -Xmx%sm -jar craftbukkit.jar' % (java, 
               config.get('Settings', 'flags'),
               config.get('Settings', 'memory'),
               config.get('Settings', 'memory'))
     screen = 'screen -dmLS bukkit_server bash -c \'%s\'' % startup
-    command = 'cd %s;%s' % (config.get('Settings', 'environment'), screen)
+    command = 'cd %s;%s' % (env, screen)
     run(command)
     if alive():
       print 'Server startup initiated.'
