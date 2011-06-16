@@ -11,13 +11,12 @@ import getopt
 from ConfigParser import ConfigParser
 from commands import getoutput as run
 
-global config
-global conf_loc
+config = ConfigParser()
+conf_loc = None
 
 def get_config():
   global config
   global conf_loc
-  config = ConfigParser()
   cf_locs = ['/etc/baskit.ini', '~/.baskit.ini', 'baskit.ini']
   for cf_loc in cf_locs:
     if os.path.exists(cf_loc) and not config.has_section('Settings'):
