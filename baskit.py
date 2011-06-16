@@ -268,7 +268,9 @@ class Baskit(cmd.Cmd):
     '''status
     Returns the running status and basic information about the server.
     '''
-    pass
+    sts = {True: 'ALIVE', False: 'DOWN'}
+    print 'Craftbukkit Build %s' % config.get('Settings', 'build')
+    print 'Server Status is %s.' % sts[alive()]
   
   def do_snapshot(self, s):
     '''snapshot [OPTIONS]
@@ -280,13 +282,67 @@ class Baskit(cmd.Cmd):
     
     -l (--list)                   Lists the available snapshots.
     -n (--name) [NAME]            Sets the name of the snapshot.  Default is:
-                                    bukkit-[BUILD]-[DATE].snap
-    -d (--description) [TEXT]     Sets optional description of the snapshot.
-                                  This could be useful in distributing setups.
+                                    bukkit-[DATE]-[BUILD].snap
     -r (--restore) [NAME]         Restores a snapshot.
     '''
-    pass
+    env = config.get('Settings', 'environment')
+    worlds = []
+    desc = None
+    cur = datetime.datetime.now()
+    name = 'bukkit-%s-%s' % (config.get('Settings', 'build'), 
+                             cur.strftime('%Y-%m-%d_%H.%M'))
+    opts, args  = getopt.getopt(s.split(), 'ln:r:',
+                                ['list', 'name=', 'recover='])
+    for opt, val in opts:
+      if opt in ('-l', '--list'):
+        files = os.listdir(os.path.join(env, 'backup', 'snapshots'))
+        backups = []
+        for fname in files:
+          timestamp = os.stat(os.path.join(env, 'backup', 'snapshots', 
+                              fname)).st_mtime
+          backups.add((fname.strip('.snap'), 
+                       datetime.datetime.fromtimestamp(timestamp)))
+        for item in backups:
+          print '%-30s %15s' % (item[0], item[1].strftime('%Y-%m-%d %H:%M'))
+        return True
+      
+      if opt in ('-r', '--restore'):
+        if alive():
+          print 'ERROR: Server cannot be running during snapshot restore!'
+          return False
+        else:
+          snap = os.path.join(env, 'backups', 'snapshots', '%s.snap' % val)
+          print 'Starting Snapshot Restoration Process...'
+          out = run('tar xzvf %s -C %s' % (snap, env))
+          conf = ConfigParser()
+          conf.read(os.path.join(env, 'env', 'config.ini'))
+          print 'Updating settings based on snapshot...'
+          config.set('Settings', 'build', conf.get('Settings', 'build'))
+          config.set('Settings', 'branch', conf.get('Settings', 'branch'))
+          update_config()
+          print 'Cleaning up...'
+          os.remove(os.path.join(env, 'env', 'config.ini'))
+          print 'Snapshot restore complete.'
+          return True
+
+      if opt in ('-n', '--name'):
+        name = val
     
+    if alive():
+      print 'ERROR: Server cannot be running during snapshot!'
+      return False
+    else:
+      print 'Building world exclusions...'
+      for item in os.listdir(os.path.join(env, 'env')):
+        if os.path.exists(os.path.join(env, 'env', item, 'level.dat')):
+          worlds.add('--exclude="env/%s"' % item)
+      print 'Copying config into snapshot path...'
+      shutil.copyfile(conf_loc, os.path.join(env, 'env', 'config.ini'))
+      snap = os.path.join(env, 'backups', 'snapshots', '%s.snap' % name)
+      print 'Generating snapshot %s...' % name
+      out = run('tar czvf %s -C %s %s' % (snap, env, ' '.join(worlds)))
+      print 'Snapshot generation complete.'
+      return True
   
   def do_backup(self, s):
     '''backup [OPTIONS] [WORLD]
@@ -304,10 +360,10 @@ class Baskit(cmd.Cmd):
     world = args[-1]
     for opt, val in opts:
       if opt in ('-l', '--list'):
-        files = os.listdir(os.path.join(env, 'backup', 'snapshots'))
+        files = os.listdir(os.path.join(env, 'backup', 'worlds'))
         backups = []
         for fname in files:
-          timestamp = os.stat(os.path.join(env, 'backup', 'snapshots', 
+          timestamp = os.stat(os.path.join(env, 'backup', 'worlds', 
                               fname)).st_mtime
           backups.add((fname.strip('.bck'), 
                        datetime.datetime.fromtimestamp(timestamp)))
@@ -320,7 +376,7 @@ class Baskit(cmd.Cmd):
         else:
           if not os.path.exists(os.path.join(env, 'env', world)):
             os.makedirs(os.path.join(env, 'env', world))
-          backup = os.path.join(env, 'backup', 'snapshots', '%s.bck' % val)
+          backup = os.path.join(env, 'backup', 'worlds', '%s.bck' % val)
           path = os.path.join(env, 'env', world)
           print 'Restoring backup %s to %s...' % (val, world)
           run('tar xzvf %s -C %s' % (backup, path))
@@ -331,13 +387,13 @@ class Baskit(cmd.Cmd):
       
       if name is None:
         cur = datetime.datetime.now()
-        name = '%s-%s' % (world, cur.strftime('%Y-%m-%d %H:%M'))
-      backup = os.path.join(env, 'backup', 'snapshots', '%s.bck' % name)
+        name = '%s-%s' % (world, cur.strftime('%Y-%m-%d_%H.%M'))
+      backup = os.path.join(env, 'backup', 'worlds', '%s.bck' % name)
       path = os.path.join(env, 'env', world)
       print 'Generating Backup of %s named %s...' % (world, name)
       console('save-all')
       console('save-off')
-      run('tar xzvf %s -C %s' % (backup, path))
+      run('tar czvf %s -C %s' % (backup, path))
       console('save-on')
       print 'Backup created.'
 
