@@ -74,7 +74,7 @@ class Baskit(cmd.Cmd):
     for package in ['java', 'screen']:
       output = run('which %s' % package)
       chk = re.compile(r'which:\sno\s%s' % package)
-      if len(chk.finall(output)) > 0:
+      if len(chk.findall(output)) > 0:
         need_deps = True
       if output == '':
         need_deps = True
