@@ -6,6 +6,7 @@ import os
 import datetime
 import time
 import sys
+import re
 from ConfigParser import ConfigParser
 from commands import getoutput as run
 
