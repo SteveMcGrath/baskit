@@ -204,7 +204,7 @@ class Baskit(cmd.Cmd):
       config.set('Settings', 'build', build)
       config.set('Settings', 'branch', branch)
       update_config()
-      print 'Success! Craftbukkit binary now build %s.' build
+      print 'Success! Craftbukkit binary now build %s.' % build
     else:
       print 'Existing binary current. No update needed.'
   
