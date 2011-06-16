@@ -187,7 +187,7 @@ class Baskit(cmd.Cmd):
         branch = 'stable'
       if opt in ('-f', '--force'):
         force = True
-    url = branches[branch].replace('{BUILD}', build)
+    url = branches[branch].replace('{BUILD}', str(build))
     if branch == 'build':
       branch = 'dev'
     try:
