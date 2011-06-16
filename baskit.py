@@ -296,16 +296,18 @@ class Baskit(cmd.Cmd):
     -n (--name) [NAME]            Sets the name of the snapshot.  Default is:
                                     bukkit-[DATE]-[BUILD].snap
     -r (--restore) [NAME]         Restores a snapshot.
+    -v (--verbose)                Adds extra verbosity to output.
     '''
     global config
     env = config.get('Settings', 'environment')
     worlds = []
     desc = None
+    verbose = False
     cur = datetime.datetime.now()
     name = 'bukkit-%s-%s' % (config.get('Settings', 'build'), 
                              cur.strftime('%Y-%m-%d_%H.%M'))
-    opts, args  = getopt.getopt(s.split(), 'ln:r:',
-                                ['list', 'name=', 'recover='])
+    opts, args  = getopt.getopt(s.split(), 'vln:r:',
+                                ['list', 'name=', 'recover=', 'verbose'])
     for opt, val in opts:
       if opt in ('-l', '--list'):
         files = os.listdir(os.path.join(env, 'backup', 'snapshots'))
@@ -313,8 +315,8 @@ class Baskit(cmd.Cmd):
         for fname in files:
           timestamp = os.stat(os.path.join(env, 'backup', 'snapshots', 
                               fname)).st_mtime
-          backups.add((fname.strip('.snap'), 
-                       datetime.datetime.fromtimestamp(timestamp)))
+          backups.append((fname.strip('.snap'), 
+                          datetime.datetime.fromtimestamp(timestamp)))
         for item in backups:
           print '%-30s %15s' % (item[0], item[1].strftime('%Y-%m-%d %H:%M'))
         return True
@@ -324,9 +326,14 @@ class Baskit(cmd.Cmd):
           print 'ERROR: Server cannot be running during snapshot restore!'
           return False
         else:
-          snap = os.path.join(env, 'backups', 'snapshots', '%s.snap' % val)
+          snap = os.path.join(env, 'backup', 'snapshots', '%s.snap' % val)
+          print 'Moving current environment to env.old...'
+          shutil.move(os.path.join(env,'env'), os.path.join(env,'env.old'))
+          os.makedirs(os.path.join(env, 'env'))
           print 'Starting Snapshot Restoration Process...'
           out = run('tar xzvf %s -C %s' % (snap, env))
+          if verbose:
+            print out
           conf = ConfigParser()
           conf.read(os.path.join(env, 'env', 'config.ini'))
           print 'Updating settings based on snapshot...'
@@ -340,6 +347,9 @@ class Baskit(cmd.Cmd):
 
       if opt in ('-n', '--name'):
         name = val
+      
+      if opt in ('-v', '--verbose'):
+        verbose = True
     
     if alive():
       print 'ERROR: Server cannot be running during snapshot!'
@@ -348,29 +358,37 @@ class Baskit(cmd.Cmd):
       print 'Building world exclusions...'
       for item in os.listdir(os.path.join(env, 'env')):
         if os.path.exists(os.path.join(env, 'env', item, 'level.dat')):
-          worlds.add('--exclude="env/%s"' % item)
+          worlds.append('--exclude="env/%s"' % item)
       print 'Copying config into snapshot path...'
       shutil.copyfile(conf_loc, os.path.join(env, 'env', 'config.ini'))
-      snap = os.path.join(env, 'backups', 'snapshots', '%s.snap' % name)
+      snap = os.path.join(env, 'backup', 'snapshots', '%s.snap' % name)
       print 'Generating snapshot %s...' % name
-      out = run('tar czvf %s -C %s %s' % (snap, env, ' '.join(worlds)))
+      out = run('tar czvf %s -C %s %s ./' % (snap, env, ' '.join(worlds)))
+      if verbose:
+        print out
       print 'Snapshot generation complete.'
       return True
   
   def do_backup(self, s):
     '''backup [OPTIONS] [WORLD]
-    Creates, displays, and recovers world backups.
+    Creates, displays, and recovers world backups.  If no world name is
+    specified, the default of 'world' will be used.
     
     -l (--list)                   Lists the available backups.
     -n (--name) [NAME]            Sets the name of the backup.  Default is:
                                     [WORLD]-[DATE].bck
     -r (--recover) [NAME]         Recovers a backup.
+    -v (--verbose)                Adds extra verbosity to output.
     '''
     name = None
+    verbose = False
     env = config.get('Settings', 'environment')
-    opts, args  = getopt.getopt(s.split(), 'ln:r:',
-                                ['list', 'name=', 'recover='])
-    world = args[-1]
+    opts, args  = getopt.getopt(s.split(), 'vln:r:',
+                                ['list', 'name=', 'recover=', 'verbose'])
+    if len(args) > 0:
+      world = args[0]
+    else:
+      world = 'world'
     for opt, val in opts:
       if opt in ('-l', '--list'):
         files = os.listdir(os.path.join(env, 'backup', 'worlds'))
@@ -378,8 +396,8 @@ class Baskit(cmd.Cmd):
         for fname in files:
           timestamp = os.stat(os.path.join(env, 'backup', 'worlds', 
                               fname)).st_mtime
-          backups.add((fname.strip('.bck'), 
-                       datetime.datetime.fromtimestamp(timestamp)))
+          backups.append((fname.strip('.bck'), 
+                          datetime.datetime.fromtimestamp(timestamp)))
         for item in backups:
           print '%-30s %15s' % (item[0], item[1].strftime('%Y-%m-%d %H:%M'))
         return True
@@ -392,25 +410,30 @@ class Baskit(cmd.Cmd):
           backup = os.path.join(env, 'backup', 'worlds', '%s.bck' % val)
           path = os.path.join(env, 'env', world)
           print 'Restoring backup %s to %s...' % (val, world)
-          run('tar xzvf %s -C %s' % (backup, path))
+          out = run('tar xzvf %s -C %s' % (backup, path))
+          if verbose:
+            print out
           print 'Restore complete.'
         return
       if opt in ('-n', '--name'):
         name = val
       
-      if name is None:
-        cur = datetime.datetime.now()
-        name = '%s-%s' % (world, cur.strftime('%Y-%m-%d_%H.%M'))
-      backup = os.path.join(env, 'backup', 'worlds', '%s.bck' % name)
-      path = os.path.join(env, 'env', world)
-      print 'Generating Backup of %s named %s...' % (world, name)
-      if alive():
-        console('save-all')
-        console('save-off')
-      run('tar czvf %s -C %s' % (backup, path))
-      if alive():
-        console('save-on')
-      print 'Backup created.'
+    if name is None:
+      cur = datetime.datetime.now()
+      name = '%s-%s' % (world, cur.strftime('%Y-%m-%d_%H.%M'))
+      print name
+    backup = os.path.join(env, 'backup', 'worlds', '%s.bck' % name)
+    path = os.path.join(env, 'env', world)
+    print 'Generating Backup of %s named %s...' % (world, name)
+    if alive():
+      console('save-all')
+      console('save-off')
+    out = run('tar czvf %s -C %s ./' % (backup, path))
+    if verbose:
+      print out
+    if alive():
+      console('save-on')
+    print 'Backup created.'
 
 if __name__ == '__main__':
   if len(sys.argv) > 1:
