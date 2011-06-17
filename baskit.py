@@ -128,6 +128,9 @@ class Baskit(cmd.Cmd):
             else:
               print 'Please install java & screen.\n'
   
+  def help_help(self, s):
+    print 'help [COMMAND]'
+  
   def do_exit(self, s):
     '''exit
     Exits the Interactive CLI'''
