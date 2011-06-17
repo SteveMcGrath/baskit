@@ -10,6 +10,29 @@ import re
 import getopt
 from ConfigParser import ConfigParser
 from commands import getoutput as run
+from random import randint as random
+
+__version__ = '0.0.1c'
+__author__ = 'Steven McGrath'
+
+_slogans = [
+ 'Managing bukkit so you dont have to.',
+ 'Helping Minecraft admins since 2011.',
+ 'Wrapping the wrapper.',
+ 'Open Source, for your enjoyment. (Open Source responsibly)',
+ 'Pythonically awsome!',
+ 'Repository on github!',
+ 'Less than 500 Lines!',
+ 'Helps ease Notchian headaches!',
+ 'I ran out of catchy slogans. :('
+]
+
+_motd = '''Baskit v%s
+Written by: %s
+Please report any bugs or problems to the #bukget IRC channel on irc.esper.net
+
+Baskit: %s
+''' % (__version__, __author__, _slogans[random(0,len(_slogans)-1)])
 
 config = ConfigParser()
 conf_loc = None
@@ -61,6 +84,7 @@ def console(command):
 
 class Baskit(cmd.Cmd):
   prompt = 'baskit> '
+  
   def __init__(self):
     cmd.Cmd.__init__(self)
     get_config()
@@ -442,4 +466,4 @@ if __name__ == '__main__':
   if len(sys.argv) > 1:
     Baskit().onecmd(' '.join(sys.argv[1:]))
   else:
-    Baskit().cmdloop()
+    Baskit().cmdloop(_motd)
