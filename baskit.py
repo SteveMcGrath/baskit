@@ -32,6 +32,7 @@ _slogans = [
  'Ni!',
  'We want a shrubbery!',
  '%>what_girls_say.mp3 > /dev/null',
+ '#: cat pay_check > beer',
 ]
 
 _motd = '''Baskit v%s
