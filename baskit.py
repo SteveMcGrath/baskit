@@ -25,7 +25,13 @@ _slogans = [
  'Less than 500 Lines!',
  'Helps ease Notchian headaches!',
  'I ran out of catchy slogans. :(',
- '42.'
+ '42.',
+ 'killall -9 everyone and let root@localhost sort \'em out',
+ 'What does this do?',
+ 'All your minecraft are belong to us',
+ 'Ni!',
+ 'We want a shrubbery!',
+ '%>what_girls_say.mp3 > /dev/null',
 ]
 
 _motd = '''Baskit v%s
