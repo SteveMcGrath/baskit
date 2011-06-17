@@ -19,12 +19,13 @@ _slogans = [
  'Managing bukkit so you dont have to.',
  'Helping Minecraft admins since 2011.',
  'Wrapping the wrapper.',
- 'Open Source, for your enjoyment. (Open Source responsibly)',
+ 'Open Sourced for your enjoyment. (Open Source responsibly)',
  'Pythonically awsome!',
  'Repository on github!',
  'Less than 500 Lines!',
  'Helps ease Notchian headaches!',
- 'I ran out of catchy slogans. :('
+ 'I ran out of catchy slogans. :(',
+ '42.'
 ]
 
 _motd = '''Baskit v%s
