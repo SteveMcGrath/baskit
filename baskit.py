@@ -33,6 +33,9 @@ _slogans = [
  'We want a shrubbery!',
  '%>what_girls_say.mp3 > /dev/null',
  '#: cat pay_check > beer',
+ 'caffeine | brain > minecraft',
+ 'chown -R us ./base',
+ 'Keep staring ... I may do a trick.',
 ]
 
 _motd = '''Baskit v%s
