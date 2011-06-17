@@ -200,7 +200,7 @@ class Baskit(cmd.Cmd):
       build = int(title.findall(page)[0])
     except:
       print 'ERROR: Webpage does not contain version number!'
-      return False
+      return
     if build > cbuild or force:
       try:
         print 'Downloading craftbukkit to temporary location...'
@@ -210,7 +210,7 @@ class Baskit(cmd.Cmd):
         cb_tmp.close()
       except:
         print 'ERROR: Could not successfully save binary!'
-        return False
+        return
       print 'Moving new binary into place...'
       shutil.move(os.path.join(env, 'env', '.craftbukkit.jar'),
                   os.path.join(env, 'env', 'craftbukkit.jar'))
@@ -322,12 +322,12 @@ class Baskit(cmd.Cmd):
                           datetime.datetime.fromtimestamp(timestamp)))
         for item in backups:
           print '%-30s %15s' % (item[0], item[1].strftime('%Y-%m-%d %H:%M'))
-        return True
+        return
       
       if opt in ('-r', '--restore'):
         if alive():
           print 'ERROR: Server cannot be running during snapshot restore!'
-          return False
+          return
         else:
           snap = os.path.join(env, 'backup', 'snapshots', '%s.snap' % val)
           print 'Moving current environment to env.old...'
@@ -346,7 +346,7 @@ class Baskit(cmd.Cmd):
           print 'Cleaning up...'
           os.remove(os.path.join(env, 'env', 'config.ini'))
           print 'Snapshot restore complete.'
-          return True
+          return
 
       if opt in ('-n', '--name'):
         name = val
@@ -356,7 +356,7 @@ class Baskit(cmd.Cmd):
     
     if alive():
       print 'ERROR: Server cannot be running during snapshot!'
-      return False
+      return
     else:
       print 'Building world exclusions...'
       for item in os.listdir(os.path.join(env, 'env')):
@@ -370,7 +370,7 @@ class Baskit(cmd.Cmd):
       if verbose:
         print out
       print 'Snapshot generation complete.'
-      return True
+      return
   
   def do_backup(self, s):
     '''backup [OPTIONS] [WORLD]
@@ -403,7 +403,7 @@ class Baskit(cmd.Cmd):
                           datetime.datetime.fromtimestamp(timestamp)))
         for item in backups:
           print '%-30s %15s' % (item[0], item[1].strftime('%Y-%m-%d %H:%M'))
-        return True
+        return
       if opt in ('-r', '--recover'):
         if alive():
           print 'ERROR: Server cannot be running during restore!'
