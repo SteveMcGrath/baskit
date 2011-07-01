@@ -72,7 +72,8 @@ def get_config():
     config.set('Settings', 'environment', os.getcwd())
     config.set('Settings', 'build', '0')
     config.set('Settings', 'branch', 'stable')
-    config.set('Settings', 'memory', '1024')
+    config.set('Settings', 'memory_min', '1024')
+    config.set('Settings', 'memory_max', '1024')
     config.set('Settings', 'flags', '')
     conf_loc = 'baskit.ini'
     update_config()
@@ -307,8 +308,8 @@ class Baskit(cmd.Cmd):
     java = run('which java')
     startup = '%s %s -Xms%sm -Xmx%sm -jar craftbukkit.jar' % (java, 
               config.get('Settings', 'flags'),
-              config.get('Settings', 'memory'),
-              config.get('Settings', 'memory'))
+              config.get('Settings', 'memory_min'),
+              config.get('Settings', 'memory_max'))
     screen = 'screen -dmLS bukkit_server bash -c \'%s\'' % startup
     command = 'cd %s;%s' % (env, screen)
     run(command)
