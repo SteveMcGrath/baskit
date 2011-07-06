@@ -164,7 +164,7 @@ class Baskit(cmd.Cmd):
     logfile = open(lfname, 'r')
     size = os.stat(lfname)[6]
     logfile.seek(size)
-    console('list')
+    console('listt')
     need_players = True
     while need_players:
       where = logfile.tell()
