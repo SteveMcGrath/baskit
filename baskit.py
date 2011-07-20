@@ -275,6 +275,9 @@ class Baskit(cmd.Cmd):
     -n (--notify)                 Notifys the players that the server is in
                                   a shutdown period.
     '''
+    if not alive():
+      print 'No Server running.'
+      return
     players = False
     notify = False
     wait = datetime.datetime.now()
@@ -307,6 +310,9 @@ class Baskit(cmd.Cmd):
     '''start
     Starts the bukkit server.
     '''
+    if alive():
+      print 'Server already running.'
+      return
     env = os.path.join(config.get('Settings', 'environment'), 'env')
     java = run('which java')
     startup = '%s %s -Xms%sm -Xmx%sm -jar craftbukkit.jar' % (java, 
