@@ -158,6 +158,9 @@ class Baskit(cmd.Cmd):
     '''players
     Returns the list of currently connected players.
     '''
+    if not alive():
+      print 'Server is not running, cannot list players.'
+      return
     players = []
     replayers = re.compile(r'Connected players: (.+)')
     lfname = os.path.join(self.env, 'env', 'server.log')
