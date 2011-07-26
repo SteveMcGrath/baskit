@@ -90,9 +90,31 @@ def alive():
   else:
     return False
 
-def console(command):
-  if alive():
-    run('screen -S bukkit_server -p0 -X stuff \'%s\n\'' % command)
+def console(command, wait=None, env='/opt/minecraft'):
+  if not alive():
+    print 'Server not Alive, could not send command'
+    return None
+  if wait is not None:
+    rex = re.compile(wait)
+    lfname = os.path.join(env, 'env', 'server.log')
+    logfile = open(lfname, 'r')
+    size = os.stat(lfname)[6]
+    logfile.seek(size)
+    line = None
+  run('screen -S bukkit_server -p0 -X stuff \'%s\n\'' % command)
+  if wait is not None:
+    found = False
+    while not found:
+      where = logfile.tell()
+      line = logfile.readline()
+      if not line:
+        time.sleep(0.1)
+        logfile.seek(where)
+      else:
+        if len(rex.findall(line)) > 0:
+          found = True
+    logfile.close()
+  return line
 
 class Baskit(cmd.Cmd):
   prompt = 'baskit> '
@@ -162,25 +184,9 @@ class Baskit(cmd.Cmd):
       print 'Server is not running, cannot list players.'
       return
     players = []
-    replayers = re.compile(r'Connected players: (.+)')
-    lfname = os.path.join(self.env, 'env', 'server.log')
-    logfile = open(lfname, 'r')
-    size = os.stat(lfname)[6]
-    logfile.seek(size)
-    console('listt')
-    need_players = True
-    while need_players:
-      where = logfile.tell()
-      line = logfile.readline()
-      if not line:
-        time.sleep(0.1)
-        logfile.seek(where)
-      else:
-        plist = replayers.findall(line)
-        if len(plist) > 0:
-          need_players = False
-          players = plist[0].split(', ')
-    logfile.close()
+    replayers = re.compile(r' ([^,]*)')
+    line = console('listt', wait=r'Connected players:', env=self.env)
+    players = replayers.findall(line.split(':')[1])
     if silent:
       return players
     else:
@@ -477,13 +483,13 @@ class Baskit(cmd.Cmd):
     path = os.path.join(env, 'env', world)
     print 'Generating Backup of %s named %s...' % (world, name)
     if alive():
-      console('save-all')
-      console('save-off')
+      console('save-all', wait=r'Save complete', env=self.env)
+      console('save-off', wait=r'Disabling level saving', env=self.env)
     out = run('tar czvf %s -C %s ./' % (backup, path))
     if verbose:
       print out
     if alive():
-      console('save-on')
+      console('save-on', wait='Enabling level saving', env=self.env)
     print 'Backup created.'
 
 if __name__ == '__main__':
