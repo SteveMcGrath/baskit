@@ -94,13 +94,13 @@ def console(command, wait=None, env='/opt/minecraft'):
   if not alive():
     print 'Server not Alive, could not send command'
     return None
+  line = None
   if wait is not None:
     rex = re.compile(wait)
     lfname = os.path.join(env, 'env', 'server.log')
     logfile = open(lfname, 'r')
     size = os.stat(lfname)[6]
     logfile.seek(size)
-    line = None
   run('screen -S bukkit_server -p0 -X stuff \'%s\n\'' % command)
   if wait is not None:
     found = False
