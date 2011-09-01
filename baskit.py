@@ -12,7 +12,7 @@ from ConfigParser import ConfigParser
 from commands import getoutput as run
 from random import randint as random
 
-__version__ = '0.0.1c'
+__version__ = '0.0.1c1'
 __author__ = 'Steven McGrath'
 
 _slogans = [
@@ -419,8 +419,9 @@ class Baskit(cmd.Cmd):
       print 'Copying config into snapshot path...'
       shutil.copyfile(conf_loc, os.path.join(env, 'env', 'config.ini'))
       snap = os.path.join(env, 'backup', 'snapshots', '%s.snap' % name)
+      exbackup = '--exclude="backup"'
       print 'Generating snapshot %s...' % name
-      out = run('tar czvf %s -C %s %s ./' % (snap, env, ' '.join(worlds)))
+      out = run('tar czvf %s -C %s %s %s ./' % (snap, env, exbackup, ' '.join(worlds)))
       if verbose:
         print out
       print 'Snapshot generation complete.'
@@ -497,3 +498,4 @@ if __name__ == '__main__':
     Baskit().onecmd(' '.join(sys.argv[1:]))
   else:
     Baskit().cmdloop(_motd)
+
