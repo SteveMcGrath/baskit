@@ -186,7 +186,7 @@ class Baskit(cmd.Cmd):
     players = []
     replayers = re.compile(r' ([^,]*)')
     line = console('listt', wait=r'Connected players:', env=self.env)
-    players = replayers.findall(line.split(':')[1])
+    players = replayers.findall(line.split(':')[3])
     if silent:
       return players
     else:
