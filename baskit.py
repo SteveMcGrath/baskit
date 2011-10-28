@@ -56,7 +56,8 @@ if sys.version_info < (2, 6):
 def get_config():
     global config
     global conf_loc
-    cf_locs = ['/etc/baskit.ini', '~/.baskit.ini', 'baskit.ini']
+    userhome = os.environ["HOME"]
+    cf_locs = ['/etc/baskit.ini', userhome+'/.baskit.ini', 'baskit.ini']
     for cf_loc in cf_locs:
         if os.path.exists(cf_loc) and not config.has_section('Settings'):
             conf_loc = cf_loc
