@@ -254,7 +254,7 @@ class RamManager:
 
     def setupWorlds(self, verbose=0):
         '''Called to mount the ram disk worlds and populate them with data'''
-        lockfile = open(os.path.join(self.env, "baskitlock", "w"))
+        lockfile = open(os.path.join(self.env, "baskitlock"), "w")
         fcntl.flock(lockfile, fcntl.LOCK_EX)
         for world in self.worlds.itervalues():
             assert isinstance(world, RamWorld)  
@@ -269,7 +269,7 @@ class RamManager:
 
     def cleanupWorlds(self, verbose=0):
         '''Called to save the data from the worlds and unmount them'''
-        lockfile = open(os.path.join(self.env, "baskitlock", "w"))
+        lockfile = open(os.path.join(self.env, "baskitlock"), "w")
         fcntl.flock(lockfile, fcntl.LOCK_EX)
         for world in self.worlds.itervalues():
             assert isinstance(world, RamWorld)  
@@ -280,12 +280,12 @@ class RamManager:
 
     def mergeWorlds(self, verbose=0):
         '''Called to save the data from the ramdisk worlds'''
-        lockfile = open(os.path.join(self.env, "baskitlock", "w"))
+        lockfile = open(os.path.join(self.env, "baskitlock"), "w")
         fcntl.flock(lockfile, fcntl.LOCK_EX)
         for world in self.worlds.itervalues():
             assert isinstance(world, RamWorld)  
             rsyncFolder(world.rampath, world.persistpath, verbose)
-            freesize = int(run("df -B 1M %s" % world.rampath).split()[3])
+            freesize = int(run("df -B 1M %s | tail -1" % world.rampath).split()[3])
             if freesize < world.freewarn:
                 print "WARNING: space is low on %s" % world.worldname 
         lockfile.close()
@@ -298,7 +298,7 @@ class RamManager:
         returns full path to directory to backup
         '''
         if self.worlds.has_key(worldname):
-            lockfile = open(os.path.join(self.env, "baskitlock", "w"))
+            lockfile = open(os.path.join(self.env, "baskitlock"), "w")
             fcntl.flock(lockfile, fcntl.LOCK_EX)
             world = self.worlds[worldname]
             assert isinstance(world, RamWorld)  
@@ -465,25 +465,6 @@ class Baskit(cmd.Cmd):
         else:
             print 'Existing binary current. No update needed.'
     
-    def do_mount(self, s):
-        '''mount [OPTIONS]
-        Temporary test command to just perform the mount.
-        
-        -v (--verbose)                Make the mount output verbose
-        '''
-        if alive():
-            print 'ERROR: Server cannot be running during mount!'
-            return
-        verbose = 0
-        opts, unused_args  = getopt.getopt(s.split(), 'v',
-                ['verbose'])
-        for opt, unused_val in opts:
-            if opt in ('-v', '--verbose'):
-                verbose += 1
-
-        self.ram.setupWorlds(verbose)                
-                
-
     def do_crashfix(self, s):
         '''crashfix [OPTIONS]
         Command to sync and unmount ramdisk worlds following abnormal stop of server
@@ -682,8 +663,9 @@ class Baskit(cmd.Cmd):
             shutil.copyfile(conf_loc, os.path.join(self.env, 'env', 'config.ini'))
             snap = os.path.join(self.env, 'backup', 'snapshots', '%s.snap' % name)
             exbackup = '--exclude="backup"'
+            expersist = '--exclude="%s"' % self.ram.persistFolder
             print 'Generating snapshot %s...' % name
-            out = run('tar czvf %s -C %s %s %s ./' % (snap, self.env, exbackup, ' '.join(worlds)))
+            out = run('tar czvf %s -C %s %s %s %s ./' % (snap, self.env, exbackup, expersist, ' '.join(worlds)))
             if verbose:
                 print out
             print 'Snapshot generation complete.'
