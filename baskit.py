@@ -22,7 +22,7 @@ _slogans = [
     'Helping Minecraft admins since 2011.',
     'Wrapping the wrapper.',
     'Open Sourced for your enjoyment. (Open Source responsibly)',
-    'Pythonically awsome!',
+    'Pythonically awesome!',
     'Repository on github!',
     'Less than 800 Lines!',
     'Helps ease Notchian headaches!',
@@ -137,13 +137,12 @@ def rsyncFolder(sourcepath, destpath, verbose=0):
 
 class RamWorld:
     '''RamWorld utility class for RamManager holds the data about one world'''
-    def __init__(self, worldname, rampath, persistpath, mountsize, freewarn):
+    def __init__(self, worldname, rampath, persistpath, freewarn=5):
         self.worldname = worldname          # world name (no path)
         self.rampath = rampath              # full path to ram disk
         self.persistpath = persistpath      # full path to persist folder
-        self.mountsize = mountsize          # size to mount (mb)
         self.freewarn = freewarn            # min free size (mb)
-    
+
 class RamManager:
     '''RamManager - ram disk configuration and list'''
     
@@ -190,19 +189,21 @@ class RamManager:
             namepath = os.path.join(self.persistPath, name)
             if os.path.isdir(namepath):
                 rampath = os.path.join(self.env, "env", name)
-                # get disk size in mb
-                size = int(run("du -m -s %s" % namepath).split()[0])
-                bumpsize = size / 10
-                if bumpsize < 10:
-                    bumpsize = 10
-                mountsize = size  + bumpsize
-                freewarn = bumpsize / 2
-                self.worlds[name] = RamWorld(name, rampath, namepath, mountsize, freewarn)
+                self.worlds[name] = RamWorld(name, rampath, namepath)
         
     def mountWorld(self, world, verbose=0):
         '''world - instance of RamWorld'''
         assert isinstance(world, RamWorld)
         if self.enable:
+            # get disk size in mb
+            size = int(run("du -m -s %s" % world.persistpath).split()[0])
+            bumpsize = size / 10    # default to 10%
+            if bumpsize < 10:       # but with a 10mb minimum
+                bumpsize = 10
+            target_mountsize = size  + bumpsize
+            world.freewarn = bumpsize / 2   # warn at 50% of free space
+            
+            
             if self.autoMount:
                 if not os.path.exists(world.rampath):
                     os.makedirs(world.rampath)
@@ -210,7 +211,7 @@ class RamManager:
                 args = ["sudo"]
                 if len(self.sudoPW) > 0:
                     args.append("-S")
-                args.extend(["mount", "-t", "tmpfs", "none", world.rampath, "-o", "size=%sm" % world.mountsize])
+                args.extend(["mount", "-t", "tmpfs", "none", world.rampath, "-o", "size=%sm" % target_mountsize])
                 if verbose > 0:
                     print " ".join(args)
                 if len(self.sudoPW) > 0:
@@ -227,10 +228,10 @@ class RamManager:
                     sys.exit(1)
                 # Verify size of the ramdisk
                 mountsize = int(run("df -B 1M %s" % world.rampath).split()[1])
-                if mountsize < world.mountsize:
+                if mountsize < target_mountsize:
                     print "RAMDISK SIZE ERROR:"
                     print "   The ramdisk at %s" % world.rampath
-                    print "   is %dmb but needs to be at least %dmb" % (mountsize, world.mountsize)
+                    print "   is %dmb but needs to be at least %dmb" % (mountsize, target_mountsize)
                     sys.exit(1)
     
     def unmountWorld(self, world, verbose=0):
@@ -390,7 +391,7 @@ class Baskit(cmd.Cmd):
   
     def do_console(self, s):
         '''console
-        Opens the Bukkit console  To exit the console type Cntrl+A D
+        Opens the Bukkit console  To exit the console type Ctrl+A D
         '''
         os.system('screen -DRS bukkit_server')
   
@@ -588,9 +589,9 @@ class Baskit(cmd.Cmd):
         '''snapshot [OPTIONS]
         Creates, displays, and manages server snapshots.  A server snapshot
         contains the completely functional state of the bukkit server environment.
-        Snapshots can only be taken when the server is shit down, so please keep
+        Snapshots can only be taken when the server is shut down, so please keep
         this in mind before using.  Snapshots are most useful in making a restore
-        point before an upgrade.  Sapshots do NOT contain map or world data.
+        point before an upgrade.  Snapshots do NOT contain map or world data.
     
         -l (--list)                   Lists the available snapshots.
         -n (--name) [NAME]            Sets the name of the snapshot.  Default is:
