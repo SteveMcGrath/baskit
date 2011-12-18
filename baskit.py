@@ -589,7 +589,14 @@ class Baskit(cmd.Cmd):
             print 'Server startup initiated.'
         else:
             print 'Server startup failed.'
-  
+    
+    def do_restart(self, s):
+        '''restart
+        Convenience function to restart the server.  No options are provided.
+        '''
+        self.do_stop('')
+        self.do_start('')
+    
     def do_status(self, s):
         '''status
         Returns the running status and basic information about the server.
