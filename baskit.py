@@ -10,6 +10,8 @@ import re
 import getopt
 import subprocess
 import fcntl
+import zipfile
+from StringIO import StringIO
 from ConfigParser import ConfigParser
 from commands import getoutput as run
 from random import randint as random
@@ -412,7 +414,7 @@ class Baskit(cmd.Cmd):
         branch = config.get('Settings', 'branch')
         cbuild = config.getint('Settings', 'build')
         build = 0
-        artifact = '/artifact/target/craftbukkit-0.0.1-SNAPSHOT.jar'
+        artifact = '/artifact/*zip*/archive.zip'
         ci = 'http://ci.bukkit.org/job/dev-CraftBukkit'
         branches = {
           'stable': '%s/promotion/latest/Recommended' % ci,
@@ -446,15 +448,26 @@ class Baskit(cmd.Cmd):
             print 'ERROR: Webpage does not contain version number!'
             return
         if build > cbuild or force:
-            try:
-                print 'Downloading craftbukkit to temporary location...'
-                cb_bin = urllib2.urlopen(url + artifact).read()
-                cb_tmp = open(os.path.join(self.env, 'env', '.craftbukkit.jar'), 'wb')
-                cb_tmp.write(cb_bin)
-                cb_tmp.close()
-            except:
-                print 'ERROR: Could not successfully save binary!'
-                return
+            #try:
+            print 'Downloading craftbukkit to temporary location...'
+            data = StringIO()
+            data.write(urllib2.urlopen(url + artifact).read())
+            zf = zipfile.ZipFile(data)
+            for item in zf.namelist():
+                if item[-3:].lower() == 'jar':
+                    cb_tmp = open(os.path.join(self.env, 'env', '.craftbukkit.jar'), 'wb')
+                    cb_tmp.write(zf.read(item))
+                    cb_tmp.close()                        
+                
+                # This code is now broken.  We are using the new, more 
+                # convoluted method.  hopefully the new one will not break.
+                #cb_bin = urllib2.urlopen(url + artifact).read()
+                #cb_tmp = open(os.path.join(self.env, 'env', '.craftbukkit.jar'), 'wb')
+                #cb_tmp.write(cb_bin)
+                #cb_tmp.close()
+            #except:
+            #    print 'ERROR: Could not successfully save binary!'
+            #    return
             print 'Moving new binary into place...'
             shutil.move(os.path.join(self.env, 'env', '.craftbukkit.jar'),
                                     os.path.join(self.env, 'env', 'craftbukkit.jar'))
