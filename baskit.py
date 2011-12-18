@@ -165,9 +165,9 @@ class RamManager:
                     'Adding section, defaulting RamDisk Support to off.\n',
                     ])
             config.add_section('RamDisk')
-            config.set('RamDisk', 'enable_ramdisks', False)
+            config.set('RamDisk', 'enable_ramdisks', 'false')
             config.set('RamDisk', 'persist_folder', 'persist')
-            config.set('RamDisk', 'automount_ramdisks', True)
+            config.set('RamDisk', 'automount_ramdisks', 'yes')
             config.set('RamDisk', 'sudo_password_if_required', '')
             update_config()
     
