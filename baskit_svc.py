@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+from hashlib import md4
 from commands import getoutput
 import json
 import datetime
@@ -84,65 +85,97 @@ class MCServer(threaded.Thread):
                         # know what we are doing.
     worlds = []         # This is the list of worlds that the minecraft server
                         # will be working with.
+    _query = {}         # This is a dictionary of all of the queries that are
+                        # to be sent to the database, their status in the
+                        # queue, and their result.
+    _active = False     # Determins if the server is supposed to be active or
+                        # not.
+    _query_count = 0    # Hold how many queries have been called since the
+                        # server's start.
+    _stop = False       # This is a failsafe to stop the thread.  This should
+    
+    def _send(self, msg):
+        '''
+        Sends a command to the standard input of the minecraft server.
+        '''
+        self.server.stdin.write('%s\n' % msg)
     
     def run(self):
         '''
+        
         '''
+        while not self._stop:
+            time.sleep(0.1)
+            
+            
+    
+    def query(msg, rex):
+        '''
+        Queries the minecraft server and waits for the output to be presented.
+        '''
+        self._query_count += 1
+        x = self._query_count
+        self._query[x] = {
+            'run': False,
+            'reply': None,
+            'command': msg,
+            'regex': re.compile(rex),
+        }
+        while self._query[x]['reply'] == None:
+            time.sleep(0.1)
+        return self._query[x]['reply']
     
     def get_conf(self, name):
         '''
         Simply gets the configuration options from the config file.
         '''
         self.name = name
-        self.path = self.config('path')
-        self.bin = self.config('type')
+        self.path = config[name]['path']
+        self.bin = config[name]['bin_type']
     
-    def mc_start(self):
+    def server_start(self):
         '''
         Starts the minecraft server
         '''
+        self._active = True
     
-    def mc_stop(self):
+    def server_stop(self):
         '''
         Stops the minecraft server
         '''
+        self._active = False
     
-    def mc_running(self):
+    def server_running(self):
         '''
         Checks to see if the process is still running.  Returns True if the
         server is running and False if not.
         '''
     
-    def mc_send(self, msg):
-        '''
-        Sends a command to the standard input of the minecraft server.
-        '''
-        self.server.stdin.write('%s\n' % msg)
-    
-    def mc_snapshot(self, name):
+    def server_snapshot(self, name):
         '''
         Generates a snapshot of the current server configuration, binaries,
         and plugins if there are any
         '''
     
-    def mc_backup(self, world, name):
+    def server_backup(self, world, name):
         '''
         Generates a backup of the provided world name and saves it to a new
         archive with the specified name.
         '''
     
-    def mc_world_restore(self, world, name):
+    def server_world_restore(self, world, name):
         '''
         Restores a world backup file to the specified world
         '''
     
-    def mc_snap_restore(self, name):
+    def server_snap_restore(self, name):
         '''
         Restores a snapshot.
         '''
     
-    def mc_update(self, btype='vanilla', build=None):
+    def server_update(self, btype='vanilla', build=None):
         '''
         Updates the binary to the specified version.  This action will also
         automatically perfoprm a snapshot before the update starts.
         '''
+        
