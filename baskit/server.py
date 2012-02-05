@@ -33,10 +33,9 @@ class Server(object):
     worlds = []
     _config_file = 'baskit.conf'
     
-    def __init__(self, name, config_file='baskit.conf'):
+    def __init__(self):
         '''Baskit server initialization
         '''
-        self.name = name
         self._config_file = config.get_config_file()
         self.get_config()
     
@@ -61,7 +60,8 @@ class Server(object):
         # Setting the section name and fetching the information from the
         # configuration file and applying those values to the appropriate
         # object variable.
-        section = 'Server: %s' % self.name
+        section = 'Server'
+        self.name = conf.get(section, 'name')
         self.java_args = conf.get(section, 'java_args')
         self.binary = conf.get(section, 'binary')
         self.env = conf.get(section, 'environment')
@@ -95,7 +95,8 @@ class Server(object):
         
         # Setting the section name and commiting the variables to the config
         # file.
-        section = 'Server: %s' % self.name
+        section = 'Server'
+        conf.set(section, 'name', self.name)
         conf.set(section, 'binary', self.binary)
         conf.set(section, 'environment', self.env)
         conf.set(section, 'server_type', self.server_type)
