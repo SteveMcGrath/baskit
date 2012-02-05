@@ -1,6 +1,7 @@
 from urllib2 import urlopen
 from StringIO import StringIO
 from zipfile import ZipFile
+import re
 
 class Error(Exception):
     def __init__(self, value):
