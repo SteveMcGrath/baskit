@@ -33,7 +33,7 @@ class World(object):
     
     def set_config(self):
         '''set_config
-        Sets the values int he config file to the values in the object.
+        Sets the values in the config file to the values in the object.
         '''
         section = 'World: %s' % self.name
         conf = ConfigParser()
