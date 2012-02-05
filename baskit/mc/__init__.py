@@ -19,9 +19,9 @@ def download(server_type='vanilla', build_type='stable'):
         return vanilla.download(build_type)
     if server_type == 'bukkit':
         return bukkit.download(build_type)
-    if server_type == 'spout':
-        return spout.download(build_type)
-    if server_type == 'canary':
-        return canary.download(build_type)
+    #if server_type == 'spout':
+    #    return spout.download(build_type)
+    #if server_type == 'canary':
+    #    return canary.download(build_type)
     else:
         return None
