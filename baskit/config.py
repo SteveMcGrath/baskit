@@ -15,6 +15,7 @@ def get_config_file():
 
 cample_config = '''
 [Server: default]
+name            = default
 java_args       = 
 environment     = /opt/minecraft
 binary          = server.jar
