@@ -8,6 +8,7 @@ from ConfigParser import ConfigParser
 from world import World
 import mc
 import screen
+import config
 
 def compress_folder(zip_filename, location, from_loc=None, excludes=[]):
     zfile = ZipFile(zip_filename, 'a')
@@ -36,13 +37,7 @@ class Server(object):
         '''Baskit server initialization
         '''
         self.name = name
-        if not os.path.exists(config_file):
-            config_file = '%s/.baskit.conf' % sys.env['HOME']
-        if not os.path.exists(config_file):
-            config_file = '/etc/baskit.conf'
-        if not os.path.exists(config_file):
-            self.set_config()
-        self._config_file = config_file
+        self._config_file = config.get_config_file()
         self.get_config()
     
     def running(self):
@@ -58,29 +53,29 @@ class Server(object):
         '''
         
         # Initializing the configration parser and reading the config file.
-        config = ConfigParser()
+        conf = ConfigParser()
         if config_file == None:
             config_file = self._config_file
-        config.read(config_file)
+        conf.read(config_file)
         
         # Setting the section name and fetching the information from the
         # configuration file and applying those values to the appropriate
         # object variable.
         section = 'Server: %s' % self.name
-        self.java_args = config.get(section, 'java_args')
-        self.binary = config.get(section, 'binary')
-        self.env = config.get(section, 'environment')
-        self.server_type = config.get(section, 'server_type')
-        self.server_branch = config.get(section, 'server_branch')
-        self.server_build = config.get(section, 'server_build')
-        self.min_mem = config.get(section, 'min_mem')
-        self.max_mem = config.get(section, 'max_mem')
+        self.java_args = conf.get(section, 'java_args')
+        self.binary = conf.get(section, 'binary')
+        self.env = conf.get(section, 'environment')
+        self.server_type = conf.get(section, 'server_type')
+        self.server_branch = conf.get(section, 'server_branch')
+        self.server_build = conf.get(section, 'server_build')
+        self.min_mem = conf.get(section, 'min_mem')
+        self.max_mem = conf.get(section, 'max_mem')
         
         # Linking in the worlds that we are aware of to the server
         # configuration.  This is normally entirely optional unless you would
         # like to use the backup & restore functions, or if you would like to
         # use ramdisks.
-        for world_name in config.get(section, 'worlds').split(','):
+        for world_name in conf.get(section, 'worlds').split(','):
             world_name = world_name.strip()
             self.worlds.append(World(world_name))
     
@@ -94,21 +89,21 @@ class Server(object):
         
         # Initializing the configuration parser and reading in the existing
         # data if there is any.
-        config = ConfigParser()
+        conf = ConfigParser()
         if os.path.exists(self._config_file):
-            config.read(self._config_file)
+            conf.read(self._config_file)
         
         # Setting the section name and commiting the variables to the config
         # file.
         section = 'Server: %s' % self.name
-        config.set(section, 'binary', self.binary)
-        config.set(section, 'environment', self.env)
-        config.set(section, 'server_type', self.server_type)
-        config.set(section, 'server_branch', self.server_branch)
-        config.set(section, 'server_build', self.server_build)
-        config.set(section, 'min_memory', self.min_mem)
-        config.set(section, 'max_memory', self.max_mem)
-        config.set(section, 'java_args', self.java_args)
+        conf.set(section, 'binary', self.binary)
+        conf.set(section, 'environment', self.env)
+        conf.set(section, 'server_type', self.server_type)
+        conf.set(section, 'server_branch', self.server_branch)
+        conf.set(section, 'server_build', self.server_build)
+        conf.set(section, 'min_memory', self.min_mem)
+        conf.set(section, 'max_memory', self.max_mem)
+        conf.set(section, 'java_args', self.java_args)
         
         # Now to get the list of world names that are configured with this
         # server and add them to the 'worlds' option in the configuration
@@ -116,11 +111,11 @@ class Server(object):
         wnames = []
         for world in self.worlds:
             wnames.append(world.name)
-        config.set(section, 'worlds', ', '.join(wnames))
+        conf.set(section, 'worlds', ', '.join(wnames))
         
         # Lastly, we need to write the config file to disk.
         with open(self._config_file, 'wb') as configfile:
-            config.write(configfile)
+            conf.write(configfile)
         
     
     def command(self, command, restring=None):
@@ -263,7 +258,7 @@ class Server(object):
         # compress_folder function to generate the zip file archive.
         for world in self.worlds:
             if world.name == world_name:
-                world.sync()
+                world.rpsync()
                 compress_folder(os.path.join(self.env, 'archive', 'backups', 
                                              '%s.zip' % backup_name), 
                                 os.path.join(self.env, 'env', world_name),
