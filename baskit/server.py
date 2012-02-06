@@ -242,6 +242,9 @@ class Server(object):
         # Download the new server binary
         binary = mc.download(bin_type, build_type)
         
+        if binary['binary'] == None:
+            return False
+        
         # Setting the new variable definitions...
         self.server_type = binary['server_type']
         self.server_branch = binary['branch']
@@ -308,8 +311,9 @@ class Server(object):
                         
         # Now we need to add the baskit configuration file to the snapshot.
         zfile = ZipFile(os.path.join(self.env, 'archive', 'snaps',
-                        '%s.zip' % snap_name))
+                        '%s.zip' % snap_name), 'a')
         zfile.write(self._config_file, 'baskit.config')
+        zfile.close()
     
     def env_snap_restore(self, snap_name):
         '''snap_restore [snapshot name]
@@ -332,7 +336,8 @@ class Server(object):
                         exclusion_list.append(os.path.join(dirname, f))
             
             # And here comes the deleting ;)
-            for dirname, dirs, files, in os.walk(self.env):
+            for dirname, dirs, files, in os.walk(os.path.join(self.env, 
+                                                              'env')):
                 for f in files:
                     fn = os.path.join(dirname, f)
                     if fn not in exclusion_list:
@@ -375,7 +380,7 @@ class Server(object):
             # new world.  As we are doing this the quick-n-dirty way, we will
             # simply delete the while directory tree if it exists and create
             # a new directory.
-            world_path = os.path.join(self.env, 'env', world.name)
+            world_path = os.path.join(self.env, 'env', world_name)
             try:
                 for dirname, dirs, files, in os.walk(world_path):
                     for f in files:
@@ -386,7 +391,10 @@ class Server(object):
                         os.rmdir(os.path.join(dirname, d))
             except OSError:
                 pass
-            os.mkdir(world_path)
+            try:
+                os.mkdir(world_path)
+            except OSError:
+                pass
             
             # Now lets unzip the backup...
             zfile = ZipFile(os.path.join(self.env, 'archive', 'backups',
@@ -397,7 +405,7 @@ class Server(object):
             # and create the world object if needed.
             exists = False
             if not any(world_name == world.name for world in self.worlds):
-                self.worlds.append(World(world_name, self.env))
+                self.worlds.append(World(world_name))
                 self.set_config()
             return True
         else:
