@@ -1,6 +1,8 @@
 import os
 import sys
 import re
+import time
+import datetime
 from zipfile import ZipFile
 from commands import getoutput as run
 from ConfigParser import ConfigParser
@@ -171,7 +173,7 @@ class Server(object):
         '''console
         shortcut to open the screen session directly.
         '''
-        screen.console('mc_%s' %)
+        screen.console('mc_%s' % self.name)
     
     def start(self):
         '''start
@@ -209,7 +211,7 @@ class Server(object):
         '''
         # First thing we will need to is tell the server to stop and wait for
         # the server to finish shutting down.
-        self.console('stop')
+        self.command('stop')
         while self.running():
             time.sleep(0.1)
         
