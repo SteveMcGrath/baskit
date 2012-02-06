@@ -14,7 +14,7 @@ def get_config_file():
     return config_file
 
 cample_config = '''
-[Server: default]
+[Server]
 name            = default
 java_args       = 
 environment     = /opt/minecraft
