@@ -13,29 +13,28 @@ def get_config_file():
         config_file = 'baskit.conf'
     return config_file
 
-cample_config = '''
+sample_config = '''
 [Server]
 name            = default
 java_args       = 
-environment     = /opt/minecraft
+environment     = .
 binary          = server.jar
 server_type     = vanilla
 server_branch   = stable
 server_build    = 1.0
+min_mem         = 1024
+max_mem         = 1024
 worlds          = world, world_nether, world_the_end
 
 [World: world]
-environment     = /opt/minecraft
 ramdisk         = no
 automount       = no
 
 [World: world_nether]
-environment     = /opt/minecraft
 ramdisk         = no
 automount       = no
 
 [World: world_the_end]
-environment     = /opt/minecraft
 ramdisk         = no
 automount       = no
 '''
