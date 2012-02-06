@@ -41,6 +41,8 @@ class World(object):
         conf = ConfigParser()
         if os.path.exists(self._config_file):
             conf.read(self._config_file)
+        if not conf.has_section(section):
+            conf.add_section(section)
         conf.set(section, 'ramdisk', self.ramdisk)
         conf.set(section, 'automount', self.automount)
         with open(self._config_file, 'wb') as configfile:
