@@ -30,7 +30,8 @@ def download(build_type='stable'):
     # One of the first things that we will need to do is build the URL for the
     # build page.  This URL will be our starting point for this whole process.
     if build_type in ['stable', 'test', 'dev']:
-        url = builds[build_type]
+        url = branches[build_type]
+        branch = build_type
     else:
         branch = 'dev'
         build = int(build_type)
@@ -52,12 +53,13 @@ def download(build_type='stable'):
     
     # Now we will check for the JAR file and return the contents if we find
     # them.
+    contents = None
     for filename in zfile.namelist():
-        if filename[:-3].lower() == 'jar':
+        if filename[-3:].lower() == 'jar':
             contents = zfile.read(filename)
-            return {
-                'server_type': 'bukkit',
-                'branch': branch,
-                'build': build,
-                'binary': contents
-            }
+    return {
+        'server_type': 'bukkit',
+        'branch': branch,
+        'build': build,
+        'binary': contents
+    }
