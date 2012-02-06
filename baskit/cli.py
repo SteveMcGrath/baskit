@@ -266,6 +266,13 @@ class Backup(cmd.Cmd):
                 print 'Restore failed.'
         else:
             print 'Server must not be running during a restore'
+    
+    def do_list(self, s):
+        '''list
+        Returns the list of backups available.
+        '''
+        for filename in os.listdir(self.backup_path):
+            print filename[:-4]
 
 class Snapshot(cmd.Cmd):
     prompt = 'baskit_ng [snapshot]>'
@@ -318,7 +325,7 @@ class Snapshot(cmd.Cmd):
         '''restore [snapshot name]
         Restores the defined snapshot.
         '''
-        if os.path.exists(os.path.join(self.backup_path, s)):
+        if os.path.exists(os.path.join(self.backup_path, '%s.zip' % s)):
             if not self.server.running():
                 if self.server.env_snap_restore(s):
                     print 'Environment restored.'
@@ -328,6 +335,13 @@ class Snapshot(cmd.Cmd):
                 print 'Server must not be running during a restore'
         else:
             print 'Snapshot does not exist.'
+    
+    def do_list(self, s):
+        '''list
+        Returns the list of snapshots available.
+        '''
+        for filename in os.listdir(self.backup_path):
+            print filename[:-4]
 
 class WorldCLI(cmd.Cmd):
     prompt = 'baskit_ng [snapshot]>'
