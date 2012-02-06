@@ -2,6 +2,8 @@ import cmd
 import datetime
 import time
 import getopt
+import os
+import datetime
 
 from server import Server
 
@@ -12,6 +14,15 @@ class BaskitCLI(cmd.Cmd):
     def __init__(self):
         cmd.Cmd.__init__(self)
         self.server = Server()
+        
+        # This is some initialization stuff to make sure that the directory
+        # structure that baskit expects is in place.
+        for item in [self.server.env,
+                     os.path.join(self.server.env, 'archive', 'backups'),
+                     os.path.join(self.server.env, 'archive', 'snaps'),
+                     os.path.join(self.server.env, 'env')]:
+            if not os.path.exists(item):
+                os.makedirs(item)
     
     def help_help(self, s):
         print 'help [COMMAND]'
@@ -63,7 +74,7 @@ class BaskitCLI(cmd.Cmd):
         -n/--notify                 Notifies the players of the current wait
                                     status for the server shutdown.
         '''
-        if not server.running():
+        if not self.server.running():
             print 'Minecraft service already stopped.'
             return
         
@@ -107,15 +118,16 @@ class BaskitCLI(cmd.Cmd):
         Returns the current server status as well as some known configuration
         information about the server.
         '''
-        if server.running():
+        if self.server.running():
             print 'Minecraft service is running'
         else:
             print 'Minecraft service is stopped'
         print '\nServer Binary Information\n-------------------------'
-        print 'Type   : %s' % server.server_type
-        print 'Branch : %s' % server.server_branch
-        print 'Build  : %s' % server.server.build
-        print 'Worlds : %s' % ', '.join(server.worlds)
+        print 'Type   : %s' % self.server.server_type
+        print 'Branch : %s' % self.server.server_branch
+        print 'Build  : %s' % self.server.server_build
+        print 'Worlds : %s' % ', '.join([world.name for world in\
+                                         self.server.worlds])
     
     def do_console(self, s):
         '''console
@@ -123,6 +135,26 @@ class BaskitCLI(cmd.Cmd):
         type Cntrl+A, D.
         '''
         self.server.console()
+    
+    def do_update(self, s):
+        '''update [server_branch/build] [server_type]
+        Updates the minecraft server binary to the specified information.
+        
+        Valid Server Types:
+            vanilla
+            bukkit
+            spout
+            canary
+        '''
+        branch = 'stable'
+        bin_type= None
+        cmd_in = s.split()
+        print cmd_in
+        if len(cmd_in) > 0:
+            branch = cmd_in[0]
+        if len(cmd_in) > 1:
+            bin_type = cmd_in[1]
+        self.server.update(branch, bin_type)
     
     def do_backup(self, s):
         '''backup
@@ -228,7 +260,7 @@ class Backup(cmd.Cmd):
             print 'invalid command'
             return
         if not self.server.running():
-            if self.server.world_restore(backup, world)
+            if self.server.world_restore(backup, world):
                 print 'World restored.'
             else:
                 print 'Restore failed.'
