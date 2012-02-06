@@ -11,8 +11,7 @@ class World(object):
     automount = True
     _config_file = 'baskit.conf'
     
-    def __init__(self, name, env):
-        self.env = env
+    def __init__(self, name):
         self.name = name
         self._config_file = config.get_config_file()
         try:
@@ -30,7 +29,7 @@ class World(object):
         conf.read(self._config_file)
         if not conf.has_section(section):
             self.set_config()
-        self.env = conf.get(section, 'environment')
+        self.env = conf.get('Server', 'environment')
         self.ramdisk = conf.getboolean(section, 'ramdisk')
         self.automount = conf.getboolean(section, 'automount')
     
@@ -42,7 +41,6 @@ class World(object):
         conf = ConfigParser()
         if os.path.exists(self._config_file):
             conf.read(self._config_file)
-        conf.set(section, 'environment', self.env)
         conf.set(section, 'ramdisk', self.ramdisk)
         conf.set(section, 'automount', self.automount)
         with open(self._config_file, 'wb') as configfile:
