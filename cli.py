@@ -28,7 +28,7 @@ slogans = [
     
 ]
 
-_motd = '''Baskit v%s
+motd = '''Baskit v%s
 Written by: %s
 Please report any bugs or problems to the #bukget IRC channel on irc.esper.net
 as well as filing them on out github page.
@@ -43,6 +43,6 @@ Baskit: %s
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        BaskitCLI().onecmd(' '.join(sys.argv[1:]))
+        baskit.cli.BaskitCLI().onecmd(' '.join(sys.argv[1:]))
     else:
-        BaskitCLI().cmdloop(motd)
+        baskit.cli.BaskitCLI().cmdloop(motd)
