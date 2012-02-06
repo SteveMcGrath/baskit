@@ -417,7 +417,7 @@ class Baskit(cmd.Cmd):
         artifact = '/artifact/*zip*/archive.zip'
         ci = 'http://ci.bukkit.org/job/dev-CraftBukkit'
         branches = {
-          'stable': '%s/promotion/latest/Recommended' % ci,
+          'stable': '%s/Recommended' % ci,
           'test': '%s/lastStableBuild' % ci,
           'dev': '%s/lastSuccessfulBuild' % ci,
           'build': '%s/{BUILD}' % ci
