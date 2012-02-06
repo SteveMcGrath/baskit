@@ -15,8 +15,11 @@ class World(object):
         self.env = env
         self.name = name
         self._config_file = config.get_config_file()
-        self.get_config()
-        
+        try:
+            self.get_config()
+        except:
+            self.set_config()
+    
     def get_config(self):
         '''get_config
         Gets the stored configuration from the config file applies those
