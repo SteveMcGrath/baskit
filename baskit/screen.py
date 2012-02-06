@@ -1,4 +1,5 @@
 from commands import getoutput as run
+import os
 
 def send(name, text, newline=True):
     '''send [screen name], [text]
@@ -22,6 +23,12 @@ def new(name, command):
     Starts up a new screen console using the name and command specified.
     '''
     run('screen -dmLS %s bash -c \'%s\'' % (name, command))
+
+def console(name):
+    '''console [screen name]
+    shortcut to directly open the screen terminal.
+    '''
+    os.system('screen -DRS %s' % name)
 
 def kill(name):
     pass
