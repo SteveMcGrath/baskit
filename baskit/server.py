@@ -43,7 +43,7 @@ class Server(object):
         '''running
         Returns True/False whether the server is running or not.
         '''
-        return screen.exists('mc_%s' % self.name):
+        return screen.exists('mc_%s' % self.name)
     
     def get_config(self, config_file=None):
         '''get_config
@@ -159,7 +159,19 @@ class Server(object):
             return relog.findall(line)
         
         # If there was no regex specified, then there is nothing to return.
-        return None  
+        return None
+    
+    def msg(self, message):
+        '''msg [Message]
+        Sends the specified message to all players.
+        '''
+        self.command('say %s' % message)
+    
+    def console(self):
+        '''console
+        shortcut to open the screen session directly.
+        '''
+        screen.console('mc_%s' %)
     
     def start(self):
         '''start
@@ -323,6 +335,10 @@ class Server(object):
                     fn = os.path.join(dirname, f)
                     if fn not in exclusion_list:
                         os.remove(fn)
+                for d in dirs:
+                    dn = os.path.join(dirname, d)
+                    if dn not in exclusion_list:
+                        os.rmdir(dn)
             
             # Now we extract the snapshot into our nice clean environment ;)
             zfile = ZipFile(os.path.join(self.env, 'archive', 'snaps', 
@@ -353,18 +369,22 @@ class Server(object):
             # out all of the existing data to make sure that we are applying
             # the backup cleanly.
             
-            # First we need to check to see if there is an existing folder
-            # for the world data to reside in, if there isnt one, then create
-            # it.
-            world_path = os.path.join(self.env, 'env', world_name)
-            if not os.path.exists(world_path):
-                os.mkdir(world_path)
-            
             # Lets clean out the current world data to make way for a nice
-            # new world.
-            for dirname, dirs, files in os.walk(world_path):
-                for f in files:
-                    os.remove(os.path.join(dirname, f))
+            # new world.  As we are doing this the quick-n-dirty way, we will
+            # simply delete the while directory tree if it exists and create
+            # a new directory.
+            world_path = os.path.join(self.env, 'env', world.name)
+            try:
+                for dirname, dirs, files, in os.walk(world_path):
+                    for f in files:
+                        fn = os.path.join(dirname, f)
+                        os.remove(os.path.join(dirname, f))
+                    for d in dirs:
+                        dn = os.path.join(dirname, d)
+                        os.rmdir(os.path.join(dirname, d))
+            except OSError:
+                pass
+            os.mkdir(world_path)
             
             # Now lets unzip the backup...
             zfile = ZipFile(os.path.join(self.env, 'archive', 'backups',
@@ -374,12 +394,35 @@ class Server(object):
             # Lastly lets check to see if this world name exists in our config
             # and create the world object if needed.
             exists = False
-            for world in self.worlds:
-                if world.name == world_name:
-                    exists = True
-            if not exists:
+            if not any(world_name == world.name for world in self.worlds):
                 self.worlds.append(World(world_name, self.env))
                 self.set_config()
             return True
         else:
             return False
+    
+    def world_add(self, world_name):
+        '''world_add [world name]
+        Adds a new world to the running configuration.
+        '''
+        self.worlds.append(World(world_name))
+        self.set_config()
+    
+    def world_rm(self, world_name):
+        '''world_rm [world name]
+        Removes the specified world from the running server config.  The
+        configuration data for this world will still exist, however will be
+        removed from the list of active worlds that the server is talking to.
+        '''
+        for world in self.worlds:
+            if world.name == world_name:
+                self.worlds.remove(world)
+        self.set_config()
+    
+    def world_get(self, world_name):
+        '''world_get [world name]
+        Returns the world of the specified name.
+        '''
+        for world in self.worlds:
+            if world_name == world.name:
+                return world
