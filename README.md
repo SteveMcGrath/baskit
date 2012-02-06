@@ -1,5 +1,14 @@
 ## baskit
 
+------
+
+**NOTE**:  The mainline version of baskit is slated to be depricated for the
+ng/v2 codebase currently under active development.  Support for this codebase
+will be offered until the new version is considered stable enough for general
+consumption
+
+------
+
 baskit is a Python wrapper for a bukkit server
 
 It currently uses screen to manage the console.
