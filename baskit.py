@@ -11,12 +11,14 @@ import getopt
 import subprocess
 import fcntl
 import zipfile
+import json
+import hashlib
 from StringIO import StringIO
 from ConfigParser import ConfigParser
 from commands import getoutput as run
 from random import randint as random
 
-__version__ = '0.0.2'
+__version__ = '0.0.2a'
 __author__ = 'Steven McGrath'
 
 _slogans = [
@@ -403,7 +405,7 @@ class Baskit(cmd.Cmd):
     
         -b (--build) [BUILD_NUMBER]   Updates the binary to a specific build.
         -d (--dev)                    Sets the branch flag to dev.
-        -t (--test)                   Sets the branch flag to test.
+        -t (--beta)                   Sets the branch flag to beta.
         -s (--stable)                 Sets the branch flag to stable.
         -f (--force)                  Forces the update, even if the build is
                                       older than the current binary.
@@ -414,14 +416,8 @@ class Baskit(cmd.Cmd):
         branch = config.get('Settings', 'branch')
         cbuild = config.getint('Settings', 'build')
         build = 0
-        artifact = '/artifact/*zip*/archive.zip'
-        ci = 'http://ci.bukkit.org/job/dev-CraftBukkit'
-        branches = {
-          'stable': '%s/Recommended' % ci,
-          'test': '%s/lastStableBuild' % ci,
-          'dev': '%s/lastSuccessfulBuild' % ci,
-          'build': '%s/{BUILD}' % ci
-        }
+        dl = 'http://dl.bukkit.org/api/1.0/downloads/projects/craftbukkit/view'
+
         opts, unused_args  = getopt.getopt(s.split(), 'b:dtsf',
                 ['build=','dev', 'test', 'stable', 'force'])
         for opt, val in opts:
@@ -430,47 +426,74 @@ class Baskit(cmd.Cmd):
                 build = int(val)
             if opt in ('-d', '--dev'):
                 branch = 'dev'
-            if opt in ('-t', '--test'):
-                branch = 'test'
+            if opt in ('-t', '--beta'):
+                branch = 'beta'
             if opt in ('-s', '--stable'):
                 branch = 'stable'
             if opt in ('-f', '--force'):
                 force = True
-        url = branches[branch].replace('{BUILD}', str(build))
-        if branch == 'build':
-            branch = 'dev'
+        branches = {
+          'stable': '%s/latest-rb' % dl,
+          'beta': '%s/latest-beta' % dl,
+          'dev': '%s/latest-dev' % dl,
+          'build': '%s/build-%i' % (dl, build)
+        }
+
+        url = branches[branch]
+
+        print 'Parsing dl.bukkit.org for version information... '
+ 
         try:
-            print 'Parsing ci page for version information...'
-            title = re.compile(r'<title>.*#(\d+).*<\/title>',re.DOTALL|re.M)
-            page = urllib2.urlopen(url).read()
-            build = int(title.findall(page)[0])
-        except:
-            print 'ERROR: Webpage does not contain version number!'
+            resp = urllib2.urlopen(urllib2.Request(url,'',{'accept':'application/json'}))
+        except urllib2.URLError, e:
+            if hasattr(e, 'reason'):
+                print 'Failed to reach the server. Reason: ', e.reason
+            elif hasattr(e, 'code'):
+               if (e.code == 404 and branch == 'build'):
+                   print 'No such build number: %s' % build
+               else:
+                   print 'The server couldn\'t fulfill the request. Error code: ', e.code
             return
+        page = resp.read()
+        json_artifact = json.loads(page)
+
+        build = int(json_artifact["build_number"])
+        print 'Build %s.' % json_artifact["build_number"]
+        #print 'File %s.' % json_artifact["file"]["url"]
+
         if build > cbuild or force:
-            #try:
             print 'Downloading craftbukkit to temporary location...'
-            data = StringIO()
-            data.write(urllib2.urlopen(url + artifact).read())
-            zf = zipfile.ZipFile(data)
-            for item in zf.namelist():
-                if item[-3:].lower() == 'jar':
-                    cb_tmp = open(os.path.join(self.env, 'env', '.craftbukkit.jar'), 'wb')
-                    cb_tmp.write(zf.read(item))
-                    cb_tmp.close()                        
-                
-                # This code is now broken.  We are using the new, more 
-                # convoluted method.  hopefully the new one will not break.
-                #cb_bin = urllib2.urlopen(url + artifact).read()
-                #cb_tmp = open(os.path.join(self.env, 'env', '.craftbukkit.jar'), 'wb')
-                #cb_tmp.write(cb_bin)
-                #cb_tmp.close()
-            #except:
-            #    print 'ERROR: Could not successfully save binary!'
-            #    return
-            print 'Moving new binary into place...'
-            shutil.move(os.path.join(self.env, 'env', '.craftbukkit.jar'),
+            try:
+                resp = urllib2.urlopen(json_artifact["file"]["url"])
+            except urllib2.URLError, e:
+                if hasattr(e, 'reason'):
+                    print 'Failed to reach the server. Reason: ', e.reason
+                elif hasattr(e, 'code'):
+                       print 'The server couldn\'t fulfill the request. Error code: ', e.code
+                return
+
+            try:
+                cb_tmp = open(os.path.join(self.env, 'env', '.craftbukkit.jar'), 'wb')
+                cb_tmp.write(resp.read())
+                cb_tmp.close()
+            except:
+                cb_tmp.close()
+                print 'ERROR: Could not successfully save binary!'
+                return
+
+            print 'Validating checksums...'
+            hash = hashlib.md5(file(os.path.join(self.env, 'env', '.craftbukkit.jar'), 'r').read()).hexdigest()
+            #print '     url md5 %s' % json_artifact["file"]["checksum_md5"]
+            #print 'computed md5 %s' % hash
+            if (hash == json_artifact["file"]["checksum_md5"]):
+                print 'Moving new binary into place...'
+                shutil.move(os.path.join(self.env, 'env', '.craftbukkit.jar'),
                                     os.path.join(self.env, 'env', 'craftbukkit.jar'))
+            else:
+                print 'ERROR: File download was corrupted! Please re-run update.'
+                os.remove(os.path.join(self.env, 'env', '.craftbukkit.jar'))
+                return
+
             print 'Updating configuration...'
             config.set('Settings', 'build', build)
             config.set('Settings', 'branch', branch)
