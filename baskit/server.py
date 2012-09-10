@@ -228,7 +228,7 @@ class Server(object):
         Returns the list of currently commected players
         '''
         repl = re.compile(r' ([^,]*)')
-        line = console('listt', r'Connected players:(.*)').strip('\n')
+        line = self.command('listt', r'Connected players:(.*)').strip('\n')
         players = repl.findall(line)
         return players
     
