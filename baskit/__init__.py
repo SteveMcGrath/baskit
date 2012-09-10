@@ -5,5 +5,6 @@ import world
 import cli
 import webapi
 
-__version__ = '0.1.1'
-__author__ = 'Steven McGrath'
+__version__ = cli.__version__
+__author__ = cli.__author__
+__email__ = cli.__email__

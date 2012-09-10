@@ -6,8 +6,11 @@ import os
 import datetime
 import sys
 from random import randint as random
-
 from server import Server
+
+__version__ = '0.2.1'
+__author__ = 'Steven McGrath'
+__email__ = 'steve@chigeek.com'
 
 class BaskitCLI(cmd.Cmd):
     prompt = 'baskit_ng>'
@@ -404,8 +407,8 @@ GitHub Repository: https://github.com/SteveMcGrath/baskit
 Informational Page: http://bukget.org/baskit
 
 Baskit: %s
-''' % (baskit.__version__, 
-       baskit.__author__, 
+''' % (__version__, 
+       __author__, 
        slogans[random(0,len(slogans)-1)])
 
 def cli():
