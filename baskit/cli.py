@@ -154,7 +154,6 @@ class BaskitCLI(cmd.Cmd):
         branch = 'stable'
         bin_type= None
         cmd_in = s.split()
-        print cmd_in
         if len(cmd_in) > 0:
             branch = cmd_in[0]
         if len(cmd_in) > 1:
