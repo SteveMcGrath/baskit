@@ -7,7 +7,7 @@ def download(build_type='stable'):
     the download.
     '''
     bin_url = 'MinecraftDownload/launcher/minecraft_server.jar?'
-    vrex = re.compile(r'Minecraft (\d\.\d{1,3})</a>')
+    vrex = re.compile(r'Minecraft (\d(?:\.\d{1,3}){1,3})</a>')
     versions = vrex.findall(urlopen('http://mcupdate.tumblr.com/').read())
     contents = urlopen('https://s3.amazonaws.com/' + bin_url).read()
     return {
