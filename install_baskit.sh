@@ -57,10 +57,10 @@ if [ "$(which pip >> /dev/null;echo $?)" == "1" ];then
         CURL="curl"
     elif [ "$(which wget >> /dev/null;echo $?)" == "0" ];then
         CURL="wget -qO-"
-    else:
+    else
         echo "Could not find either curl or wget so we couldn't automatically"
-        echo "install pip for you.  Please lookup \'install pip\' online to"
-        echo "manually install (it shouldn\'t be difficult)"
+        echo "install pip for you.  Please lookup 'install pip' online to"
+        echo "manually install (it shouldn't be difficult)"
         exit
     fi
     $CURL http://python-distribute.org/distribute_setup.py | python
