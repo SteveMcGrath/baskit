@@ -19,13 +19,13 @@ def download(build_type='rb'):
         url = '%s/latest-%s/' % (base, build_type)
     else:
         url = '%s/build-%s/' % (base, build_type)
+    url += '?_accept=application/json'
 
     # Look at that, it's all pretty json now, no more 100 lines of code ^_^
     ci = json.loads(urlopen(url).read())
-
     return {
         'server_type': 'bukkit',
         'branch': ci['channel']['slug'],
         'build': ci['build_number'],
-        'binary': urlopen(ci['file']['url']).read()
+        'binary': urlopen('http://dl.bukkit.org' + ci['file']['url']).read()
     }
