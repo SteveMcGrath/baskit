@@ -1,12 +1,17 @@
 #!/bin/bash
 
+PKG_INST=''
+PKG_SEARCH=''
+JVM=''
+
 # The first thing we need to 
 if [ "$(which yum >> /dev/null;echo $?)" == "0" ];then
     PKG_INST="yum -y install"
     PKG_SEARCH="yum search"
     JVM="java-1.6.0-openjdk"
 elif [ "$(which apt-get >> /dev/null;echo $?)" == "0" ];then
-    PKG_INST="apt-get -y update;apt-get -y install"
+    apt-get -y update
+    PKG_INST="apt-get -y install"
     PKG_SEARCH="apt-cache search"
     JVM="openjdk-6-jre"
 else
@@ -36,7 +41,7 @@ fi
 
 
 
-if [ $UID != 0];then
+if [ $UID != 0 ];then
     echo "WARNING: It's entirely possible that this script may fail."
     echo "         This is mostly due to the fact that you are running"
     echo "         it as a non-root user.  If you wish to continue"
