@@ -3,7 +3,7 @@ import sys
 
 setup(
     name='Baskit',
-    version='0.2.1.5',
+    version='0.2.2.0a',
     description='Minecraft Server Manager',
     author='Steven McGrath',
     author_email='steve@chigeek.com',
