@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # The first thing we need to 
-if [ "$(which yum;echo $?)" == "0" ];then
+if [ "$(which yum >> /dev/null;echo $?)" == "0" ];then
     PKG_INST="yum -y install"
     PKG_SEARCH="yum search"
     JVM="java-1.6.0-openjdk"
-elif [ "$(which apt-get;echo $?)" == "0" ];then
+elif [ "$(which apt-get >> /dev/null;echo $?)" == "0" ];then
     PKG_INST="apt-get -y update;apt-get -y install"
     PKG_SEARCH="apt-cache search"
     JVM="openjdk-6-jre"
@@ -20,7 +20,7 @@ else
 fi
 
 # Install Java if it isnt already installed on the host.
-if [ "$(which java;echo $?)" == "1" ];then
+if [ "$(which java >> /dev/null;echo $?)" == "1" ];then
     echo "NOTE: Installing OpenJDK 6.  While this is a older JVM, it"
     echo "      is stable and we havent seen any issues with it running"
     echo "      minecraft servers.  If you want more speed however you"
@@ -47,10 +47,10 @@ fi
 # One of the things we can do here is install pip automatically for the
 # user if they don't have it.  We can safely assume that generally this
 # will be running...
-if [ "$(which pip;echo $?)" == "1" ];then
-    if [ "$(which curl;echo $?)" == "0" ];then
+if [ "$(which pip >> /dev/null;echo $?)" == "1" ];then
+    if [ "$(which curl >> /dev/null;echo $?)" == "0" ];then
         CURL="curl"
-    elif [ "$(which wget;echo $?)" == "0" ];then
+    elif [ "$(which wget >> /dev/null;echo $?)" == "0" ];then
         CURL="wget -qO-"
     else:
         echo "Could not find either curl or wget so we couldn't automatically"
