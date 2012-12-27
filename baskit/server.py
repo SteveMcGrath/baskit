@@ -150,7 +150,7 @@ class Server(object):
             found = False
             while not found:
                 where = logfile.tell()
-                line - logfile.readline()
+                line = logfile.readline()
                 if not line:
                     time.sleep(0.1)
                     logfile.seek(where)
@@ -228,7 +228,7 @@ class Server(object):
         Returns the list of currently commected players
         '''
         repl = re.compile(r' ([^,]*)')
-        line = self.command('listt', r'Connected players:(.*)').strip('\n')
+        line = self.command('list', r'players online:(.*)')[0].strip('\n')
         players = repl.findall(line)
         return players
     

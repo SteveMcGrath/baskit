@@ -8,7 +8,7 @@ import sys
 from random import randint as random
 from server import Server
 
-__version__ = '0.2.1'
+__version__ = '0.2.2.0a'
 __author__ = 'Steven McGrath'
 __email__ = 'steve@chigeek.com'
 
@@ -149,7 +149,6 @@ class BaskitCLI(cmd.Cmd):
             vanilla
             bukkit
             spout
-            canary
         '''
         branch = 'stable'
         bin_type= None
