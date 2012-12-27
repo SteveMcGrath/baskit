@@ -65,6 +65,7 @@ if [ "$(which pip >> /dev/null;echo $?)" == "1" ];then
     fi
     $CURL http://python-distribute.org/distribute_setup.py | python
     $CURL https://raw.github.com/pypa/pip/master/contrib/get-pip.py | python
+    rm -f distribute*tar.gz
 fi
 
 # Now to actually install baskit ;)
