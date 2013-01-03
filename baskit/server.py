@@ -111,8 +111,8 @@ class Server(object):
         conf.set(section, 'server_type', self.server_type)
         conf.set(section, 'server_branch', self.server_branch)
         conf.set(section, 'server_build', self.server_build)
-        conf.set(section, 'min_memory', self.min_mem)
-        conf.set(section, 'max_memory', self.max_mem)
+        conf.set(section, 'min_mem', self.min_mem)
+        conf.set(section, 'max_mem', self.max_mem)
         conf.set(section, 'java_args', self.java_args)
         conf.set(section, 'screen_log', self.logging)
         
