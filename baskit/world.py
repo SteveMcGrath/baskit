@@ -11,6 +11,7 @@ class World(object):
     automount = True
     _config_file = 'baskit.conf'
     
+
     def __init__(self, name):
         self.name = name
         self._config_file = config.get_config_file()
@@ -19,6 +20,7 @@ class World(object):
         except:
             self.set_config()
     
+
     def get_config(self):
         '''get_config
         Gets the stored configuration from the config file applies those
@@ -33,6 +35,7 @@ class World(object):
         self.ramdisk = conf.getboolean(section, 'ramdisk')
         self.automount = conf.getboolean(section, 'automount')
     
+
     def set_config(self):
         '''set_config
         Sets the values in the config file to the values in the object.
@@ -48,6 +51,7 @@ class World(object):
         with open(self._config_file, 'wb') as configfile:
             conf.write(configfile)
     
+
     def _tmpfs_size(self):
         '''Internal Function
         Returns the calculated size for the ramdisk.  This is calculated to
@@ -60,6 +64,7 @@ class World(object):
                 total_size = os.path.getsize(os.path.join(dirpath, f))
         return int(float(total_size) * 1.1 / 1024)
     
+
     def init(self):
         '''init
         Initializes the world for the server to load.  This function mainly
@@ -78,6 +83,7 @@ class World(object):
                     raise Exception('World Mount Failed')
             self.prsync()
     
+
     def cleanup(self):
         '''cleanup
         Handles any housekeeping that may need to be done with the world as
@@ -94,6 +100,7 @@ class World(object):
                 if os.path.ismounted(world_path):
                     raise Exception('Would UnMount Failed')
     
+
     def prsync(self):
         '''prsync
         Performs a sync from the persistant data to the ramdisk
@@ -102,6 +109,7 @@ class World(object):
             return self._sync(os.path.join(self.env, 'persistant', self.name),
                               os.path.join(self.env, 'env', self.name))
     
+
     def rpsync(self):
         '''rpsync
         Performs a sync from the ramdisk to the persistant data
@@ -110,6 +118,7 @@ class World(object):
             return self._sync(os.path.join(self.env, 'env', self.name),
                               os.path.join(self.env, 'persistant', self.name))
     
+
     def _sync(self, from_path, to_path):
         '''Internal Function
         Convenience function for rsyncing.  Will use a lockfile with the
@@ -131,6 +140,7 @@ class World(object):
         
         # Remove the lockfile
         os.remove(lockfile)
+    
     
     def resize_tmpfs(self):
         '''resize_tmpfs
