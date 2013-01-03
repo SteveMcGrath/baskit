@@ -13,6 +13,7 @@ def get_config_file():
         config_file = 'baskit.conf'
     return config_file
 
+
 sample_config = '''
 [Server]
 name            = default
@@ -24,6 +25,7 @@ server_branch   = stable
 server_build    = 1.0
 min_mem         = 1024
 max_mem         = 1024
+screen_log      = no
 worlds          = world, world_nether, world_the_end
 
 [World: world]

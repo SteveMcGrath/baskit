@@ -12,6 +12,7 @@ import mc
 import screen
 import config
 
+
 def compress_folder(zip_filename, location, from_loc=None, excludes=[]):
     zfile = ZipFile(zip_filename, 'a')
     for dirpath, dirs, files in os.walk(location):
@@ -24,6 +25,7 @@ def compress_folder(zip_filename, location, from_loc=None, excludes=[]):
             zfile.write(fn, arc_name)
     zfile.close()
 
+
 class Server(object):
     name = 'default'
     java_args = ''
@@ -35,18 +37,21 @@ class Server(object):
     worlds = []
     _config_file = 'baskit.conf'
     
+
     def __init__(self):
         '''Baskit server initialization
         '''
         self._config_file = config.get_config_file()
         self.get_config()
     
+
     def running(self):
         '''running
         Returns True/False whether the server is running or not.
         '''
         return screen.exists('mc_%s' % self.name)
     
+
     def get_config(self, config_file=None):
         '''get_config
         Fetches the configuration for the server and adjusts the variables
@@ -72,6 +77,7 @@ class Server(object):
         self.server_build = conf.get(section, 'server_build')
         self.min_mem = conf.get(section, 'min_mem')
         self.max_mem = conf.get(section, 'max_mem')
+        self.logging = conf.getboolean(section, 'screen_log')
         
         # Linking in the worlds that we are aware of to the server
         # configuration.  This is normally entirely optional unless you would
@@ -81,6 +87,7 @@ class Server(object):
             world_name = world_name.strip()
             self.worlds.append(World(world_name))
     
+
     def set_config(self):
         '''set_config
         Commits the current configuration of the server object to the config
@@ -107,6 +114,7 @@ class Server(object):
         conf.set(section, 'min_memory', self.min_mem)
         conf.set(section, 'max_memory', self.max_mem)
         conf.set(section, 'java_args', self.java_args)
+        conf.set(section, 'screen_log', self.logging)
         
         # Now to get the list of world names that are configured with this
         # server and add them to the 'worlds' option in the configuration
@@ -163,18 +171,21 @@ class Server(object):
         # If there was no regex specified, then there is nothing to return.
         return None
     
+
     def msg(self, message):
         '''msg [Message]
         Sends the specified message to all players.
         '''
         self.command('say %s' % message)
     
+
     def console(self):
         '''console
         shortcut to open the screen session directly.
         '''
         screen.console('mc_%s' % self.name)
     
+
     def start(self):
         '''start
         Starts the Minecraft server and runs any per-world initialization.
@@ -203,8 +214,9 @@ class Server(object):
                                                                self.max_mem, 
                                                                self.binary)
             # And here we go, startup time!
-            screen.new('mc_%s' % self.name, startup)
+            screen.new('mc_%s' % self.name, startup, self.logging)
     
+
     def stop(self):
         '''stop
         Tells the minecraft server to stop.
@@ -223,6 +235,7 @@ class Server(object):
         for world in self.worlds:
             world.cleanup()
     
+
     def players(self):
         '''players
         Returns the list of currently commected players
@@ -232,6 +245,7 @@ class Server(object):
         players = repl.findall(line)
         return players
     
+
     def update(self, build_type='stable', bin_type=None):
         if self.running():
             return False
@@ -257,6 +271,7 @@ class Server(object):
         
         return True # We have to return something so that we know it worked ;)
         
+
     def world_backup(self, world_name, backup_name=None):
         '''backup [world name], [backup_name]
         Runs the backup procedure for the specified world.
@@ -282,6 +297,7 @@ class Server(object):
                                 os.path.join(self.env, 'env', world_name),
                                 os.path.join(self.env, 'env', world_name))
     
+
     def env_snapshot(self, snap_name=None):
         '''snapshot [snapshot name]
         Generates a Snapshot zip file
@@ -315,6 +331,7 @@ class Server(object):
         zfile.write(self._config_file, 'baskit.config')
         zfile.close()
     
+
     def env_snap_restore(self, snap_name):
         '''snap_restore [snapshot name]
         Restores a snapshot zipfile.
@@ -365,6 +382,7 @@ class Server(object):
         else:
             return False
     
+
     def world_restore(self, backup_name, world_name):
         '''world_restore [backup name]
         Restores a world backup.  If restoring to a new world, then the
@@ -411,6 +429,7 @@ class Server(object):
         else:
             return False
     
+
     def world_add(self, world_name):
         '''world_add [world name]
         Adds a new world to the running configuration.
@@ -418,6 +437,7 @@ class Server(object):
         self.worlds.append(World(world_name))
         self.set_config()
     
+
     def world_rm(self, world_name):
         '''world_rm [world name]
         Removes the specified world from the running server config.  The
@@ -429,6 +449,7 @@ class Server(object):
                 self.worlds.remove(world)
         self.set_config()
     
+
     def world_get(self, world_name):
         '''world_get [world name]
         Returns the world of the specified name.
