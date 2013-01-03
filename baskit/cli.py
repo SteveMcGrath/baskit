@@ -8,12 +8,12 @@ import sys
 from random import randint as random
 from server import Server
 
-__version__ = '0.2.2.0a'
+__version__ = '0.2.2.0b'
 __author__ = 'Steven McGrath'
 __email__ = 'steve@chigeek.com'
 
 class BaskitCLI(cmd.Cmd):
-    prompt = 'baskit_ng>'
+    prompt = 'baskit> '
     server = None
     
     def __init__(self):
@@ -29,15 +29,69 @@ class BaskitCLI(cmd.Cmd):
             if not os.path.exists(item):
                 os.makedirs(item)
     
+
     def help_help(self, s):
-        print 'help [COMMAND]'
+        print '''Welcome to the Baskit Minecraft Server Manager!
+        
+        Baskit is designed to be a minimalistic, yet powerful server management
+        system.  Baskit uses GNU-Screen at the heart of the application and
+        simply wrap around that.  This means that you can perform in-place
+        upgrades of Baskit, or even remove it completely without worry of it
+        impacting the running server. There are a lot of functions available to 
+        help assist you in managing the server as well, below is a high-level
+        list of what is available.  For further detail (including avalable
+        options) for any command, type help [COMMAND].
+
+        start                       Starts the server.
+        
+        stop                        Stops the server.
+
+        restart                     Restarts the server.
+
+        server                      Returns the running state & server binary
+                                    information that we have on-hand about
+                                    the running server.
+
+        cmd [COMMAND]               Sends the command specified to the server.
+                                    There is no limit as to what can be sent
+                                    here, and it is quite easy to script
+                                    commands into the server with this.
+
+        players                     Returns the list of players currently logged
+                                    into the server.
+
+        console                     Will drop you directly into the server
+                                    console.  From here you are directly
+                                    interacting with the server.  To detach from
+                                    the server console, hit CNTRL+A,D to exit.
+
+        update                      Allows you to update the server binary based
+                                    on the conditions you had specified.  It's 
+                                    highly recommended you run help update to
+                                    get some more detail.
+
+        backup                      All backup related functions are housed
+                                    within the backup command.  Running "backup"
+                                    will present it's help.
+
+        snapshot                    All snapshot related functions are housed
+                                    within the snapshot command.  Running
+                                    "snapshot" will present it's help.
+
+        world                       All world related functions are housed
+                                    within the world command.  Running "world"
+                                    will present it's help.  Generally this is
+                                    only needed if you are using ramdisks.
+        '''
     
+
     def do_exit(self, s):
         '''exit
         Exits the interactive CLI
         '''
         return True
     
+
     def do_cmd(self, s):
         '''cmd [COMMAND]
         Sends the specified command to the Minecraft server console
@@ -45,6 +99,7 @@ class BaskitCLI(cmd.Cmd):
         self.server.command(s)
         print 'Sent to console: %s' % s
     
+
     def do_players(self, s):
         '''players
         Retuns a list of the currently connected players
@@ -54,14 +109,16 @@ class BaskitCLI(cmd.Cmd):
         else:
             print 'Players Online: %s' % self.server.players()
     
+
     def do_start(self, s):
         '''start
         Starts the Minecraft service instance.
         '''
         self.server.start()
         time.sleep(0.1)
-        self.do_status(s)
+        self.do_server(s)
     
+
     def do_stop(self, s):
         '''stop [OPTIONS]
         Stops the Minecraft service instance.
@@ -111,6 +168,7 @@ class BaskitCLI(cmd.Cmd):
         self.server.stop()
         print 'Minecraft service has been stopped'
     
+
     def do_restart(self, s):
         '''restart
         Convenience function to restart the server.  No options are provided.
@@ -118,22 +176,29 @@ class BaskitCLI(cmd.Cmd):
         self.server.stop()
         self.server.start()
     
-    def do_status(self, s):
-        '''status
+
+    def do_server(self, s):
+        '''server
         Returns the current server status as well as some known configuration
         information about the server.
         '''
-        if self.server.running():
-            print 'Minecraft service is running'
-        else:
-            print 'Minecraft service is stopped'
-        print '\nServer Binary Information\n-------------------------'
+        d1 = {True: 'running', False: 'stopped'}
+        print 'Server Binary Information\n-------------------------'
+        print 'Status : %s' % d1[self.server.running()]
         print 'Type   : %s' % self.server.server_type
         print 'Branch : %s' % self.server.server_branch
         print 'Build  : %s' % self.server.server_build
         print 'Worlds : %s' % ', '.join([world.name for world in\
                                          self.server.worlds])
-    
+
+
+    def do_status(self, s):
+        '''status
+        Returns information about the health of the server.
+        '''
+        pass
+
+
     def do_console(self, s):
         '''console
         Opens the Minecraft service console.  To exit the console 
@@ -141,6 +206,7 @@ class BaskitCLI(cmd.Cmd):
         '''
         self.server.console()
     
+
     def do_update(self, s):
         '''update [server_branch/build] [server_type]
         Updates the minecraft server binary to the specified information.
@@ -150,15 +216,20 @@ class BaskitCLI(cmd.Cmd):
             bukkit
             spout
         '''
+        if self.server.running():
+            print 'Cannot update while the server is running!'
+            return None
         branch = 'stable'
-        bin_type= None
+        bin_type = None
         cmd_in = s.split()
         if len(cmd_in) > 0:
             branch = cmd_in[0]
         if len(cmd_in) > 1:
             bin_type = cmd_in[1]
         self.server.update(branch, bin_type)
+        self.do_server('')
     
+
     def do_backup(self, s):
         '''backup
         Handles all backup functions including management of backups.
@@ -170,8 +241,9 @@ class BaskitCLI(cmd.Cmd):
         if len(s) > 1:
             Backup(self.server).onecmd(s)
         else:
-            Backup(self.server).cmdloop(msg)
+            Backup(self.server).onecmd('help')
     
+
     def do_snapshot(self, s):
         '''snapshot
         Handles all snapshot functions including management of all snapshots.
@@ -183,8 +255,9 @@ class BaskitCLI(cmd.Cmd):
         if len(s) > 1:
             Snapshot(self.server).onecmd(s)
         else:
-            Snapshot(self.server).cmdloop(msg)
+            Snapshot(self.server).onecmd('help')
     
+
     def do_world(self, s):
         '''world
         Handles all world management functions for the server.  For more
@@ -196,17 +269,44 @@ class BaskitCLI(cmd.Cmd):
         if len(s) > 1:
             WorldCLI(self.server).onecmd(s)
         else:
-            WorldCLI(self.server).cmdloop(msg)
+            WorldCLI(self.server).onecmd('help')
+
 
 class Backup(cmd.Cmd):
-    prompt = 'baskit_ng [backup]>'
     server = None
-    
+
     def __init__(self, server):
         cmd.Cmd.__init__(self)
         self.server = server
         self.backup_path = os.path.join(self.server.env, 'archive', 'backups')
+
+
+    def help_help(self):
+        print '''Backup Management Functions 
+
+        Backups consist of only world data.  Worlds are backed up individually
+        ands stored on disk as zip files.
+
+        new [WORLD] [BACKUPNAME]        Creates a new backup of the world
+                                        specified.  Optionally you can name the 
+                                        backup as well.
+
+        remove [name|age] [VAL]         Removes backups based on the condition
+                                        sent.  If the condition is name, then
+                                        it will remove the backup specified in
+                                        the value.  If the condition is set to
+                                        age, then it will remove backups older
+                                        than the number of days specified in the
+                                        value.
+
+        restore [BACKUPNAME] [WORLD]    Restored the backup specified to the
+                                        world specified.
+
+        list                            Returns a list of the backups currently
+                                        in the pool.
+        '''
     
+
     def do_new(self, s):
         '''new [world_name] [backup_name]
         Creates a new world backup from the world specified, optionally a
@@ -227,6 +327,7 @@ class Backup(cmd.Cmd):
             print ('Not a configured world.  If this world exists,\n',
                    ' please add it to the configuration with world add')
     
+
     def do_remove(self, s):
         '''remove [name|age] [value]
         Removes backups
@@ -253,6 +354,7 @@ class Backup(cmd.Cmd):
                     os.remove(filename)
                     print 'Backup %s Deleted' % filename[:-4]
     
+
     def do_restore(self, s):
         '''restore [backup name] [world name]
         Restores the defined backup to the defined world name.
@@ -277,15 +379,35 @@ class Backup(cmd.Cmd):
         for filename in os.listdir(self.backup_path):
             print filename[:-4]
 
+
 class Snapshot(cmd.Cmd):
-    prompt = 'baskit_ng [snapshot]>'
-    server = None
-    
+    server = None    
+
     def __init__(self, server):
         cmd.Cmd.__init__(self)
         self.server = server
         self.backup_path = os.path.join(self.server.env, 'archive', 'snaps')
+
+    def help_help(self):
+        print '''Snapshot Management Functions 
+
+        Snapshots are point-in-time backups of the running binaries, plugins,
+        configurations, and anything else that isnt world data.  These are very
+        useful to run before performing either a server binary upgrade or
+        upgrading some plugins that the server uses.
+
+        new [SNAPNAME]          Generates a new snapshot.  The name is optional.
+
+        remove [SNAPNAME]       Removed the specified snapshot from the pool.
+
+        restore [SNAPNAME]      Restores a snapshot to disk.  The server must
+                                be shut down prior to restoring a snapshot as
+                                it overwites all binaries, plugins, and configs.
+
+        list                    Returns a list of the snapshots in the pool.
+        '''
     
+
     def do_new(self, s):
         '''new [snapshot_name]
         Creates a new snapshot with optionally a specified name.
@@ -298,6 +420,7 @@ class Snapshot(cmd.Cmd):
         self.server.env_snapshot(name)
         print 'Snapshot completed.'
     
+
     def do_remove(self, s):
         '''remove [name|age] [value]
         Removes snapshots
@@ -324,6 +447,7 @@ class Snapshot(cmd.Cmd):
                     os.remove(filename)
                     print 'Snapshot %s Deleted' % filename[:-4]
     
+
     def do_restore(self, s):
         '''restore [snapshot name]
         Restores the defined snapshot.
@@ -339,6 +463,7 @@ class Snapshot(cmd.Cmd):
         else:
             print 'Snapshot does not exist.'
     
+
     def do_list(self, s):
         '''list
         Returns the list of snapshots available.
@@ -346,14 +471,28 @@ class Snapshot(cmd.Cmd):
         for filename in os.listdir(self.backup_path):
             print filename[:-4]
 
+
 class WorldCLI(cmd.Cmd):
-    prompt = 'baskit_ng [snapshot]>'
     server = None
     
     def __init__(self, server):
         cmd.Cmd.__init__(self)
         self.server = server
+
+
+    def help_help(self):
+        print '''World Management Functions
+
+        Allows for the ability to add or remove worlds from the managed world
+        list within baskit.  This is generally not needed unless the server is
+        configured to use Ramdisks.
+
+        add [WORLD_NAME]    Adds the world to the configuration
+
+        rm  [WORLD_NAME]    Removes the word from the configuration.
+        '''
     
+
     def do_add(self, s):
         '''add [world_name]
         Adds the world name specified to the baskit coonfiguration.  This is
@@ -362,6 +501,7 @@ class WorldCLI(cmd.Cmd):
         '''
         self.server.world_add(s)
     
+
     def do_rm(self, s):
         '''rm [world name]
         Removes the world name specified from the list of worlds that the
@@ -402,7 +542,7 @@ Please report any bugs or problems to the #bukget IRC channel on irc.esper.net
 as well as filing them on out github page.
 
 GitHub Repository: https://github.com/SteveMcGrath/baskit
-Informational Page: http://bukget.org/baskit
+Informational Page: http://bukget.org/pages/baskit.html
 
 Baskit: %s
 ''' % (__version__, 
