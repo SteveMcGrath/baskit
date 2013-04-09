@@ -16,8 +16,10 @@ Baskit is a UNIX-specific Minecraft Server manager.  It uses a screen session to
 
 ### Installation Instructions
 
-* Install Baskit via pip or easy_install.
-* Run and enjoy!
+* Install pre-reqs: screen & java
+* Install Baskit via pip or easy_install: pip install baskit
+* Run baskit to generate env in the CWD: baskit server
+* Optional: Move baskit.conf to /etc or to ~/.baskit.conf
 
 ### Status
 
