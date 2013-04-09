@@ -1,35 +1,38 @@
-## Baskit_NG, the next generation
+## Baskit, the next generation
 
 These are the voyages of the Minecraft server wrapper, it's mission to seek 
 out new servers and minecraft communities, and to boldly run minecraft where
 no one has before
 
-### What is Baskit_NG?
+### What is Baskit?
+
+Baskit is a UNIX-specific Minecraft Server manager.  It uses a screen session to detach the server from the main console, but still allow for interactivity.
 
 ### Usage Instructions
 
+* Run baskit help for usage instructions.
+* [Video Tutorial](http://www.youtube.com/watch?v=DBM1LF93O4k) - YouTube Link
+
+
 ### Installation Instructions
+
+* Install Baskit via pip or easy_install.
+* Run and enjoy!
 
 ### Status
 
 __Whats Working__:
 
-* Not much
+* Most Everything
 
 __Whats not working__:
 
-* Everything :-p
+* Ramdisk support hasn't been tested and is likely to be removed.
 
 __Bugs__:
 
-* Nothing yet ;)
+* Player listing seems to be constantly breaking.  This is mostly due to the fact that bukkit and vanilla represent the data differently, and that this representation is constantly changing.
 
 __ToDo__:
 
-* Ramdisk Support needs to be coded
-* Console needs to be coded
-* WebAPI needs to be coded
-* Modular support needs to be coded
-* Spout binary support needs to be coded
-* Canary binary support needs to be added
-* General debug and test
+

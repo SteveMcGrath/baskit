@@ -28,9 +28,16 @@ class BaskitCLI(cmd.Cmd):
                      os.path.join(self.server.env, 'env')]:
             if not os.path.exists(item):
                 os.makedirs(item)
+
+
+    def do_help(self, s):
+        if s == '': self.onecmd('help help')
+        else:
+            cmd.Cmd.do_help(self, s) 
+
     
 
-    def help_help(self, s):
+    def help_help(self):
         print '''Welcome to the Baskit Minecraft Server Manager!
         
         Baskit is designed to be a minimalistic, yet powerful server management
@@ -78,10 +85,9 @@ class BaskitCLI(cmd.Cmd):
                                     within the snapshot command.  Running
                                     "snapshot" will present it's help.
 
-        world                       All world related functions are housed
-                                    within the world command.  Running "world"
-                                    will present it's help.  Generally this is
-                                    only needed if you are using ramdisks.
+        sync                        Handles syncing to/from ramdisk and
+                                    persistant storage if ramdisk support is
+                                    enabled (disabled by default)
         '''
     
 
@@ -256,20 +262,25 @@ class BaskitCLI(cmd.Cmd):
             Snapshot(self.server).onecmd(s)
         else:
             Snapshot(self.server).onecmd('help')
-    
 
-    def do_world(self, s):
-        '''world
-        Handles all world management functions for the server.  For more
-        information run:
-        
-        world help
+
+    def do_sync(self, s):
+        '''sync [destination] [world1, [world2, world3]]
+        Handles synchronization between the persisitant and ramdisk storage.
+        By default it will sync all of the configured worlds to the destination
+        data store specified (e.g. specifying ramdisk will sync from persistant
+        to ramdisk).  Optionally you can specify specific worlds that you would
+        like to sync.  These are comma-deliited.
+
+        destination                     This is the destination of the sync.
+                                        Can either be ramdisk or persistant.
         '''
-        msg = 'type exit to return the main console'
-        if len(s) > 1:
-            WorldCLI(self.server).onecmd(s)
-        else:
-            WorldCLI(self.server).onecmd('help')
+        opts = s.split()
+        worlds = None
+        if len(opts) > 1:
+            worlds = [a.strip() for a in ''.join(opts[1:]).split(',')]
+        if opts[0] == 'ramdisk': self.server.prsync(worlds)
+        if opts[0] == 'persistant': self.server.rpsync(worlds)
 
 
 class Backup(cmd.Cmd):
@@ -279,6 +290,12 @@ class Backup(cmd.Cmd):
         cmd.Cmd.__init__(self)
         self.server = server
         self.backup_path = os.path.join(self.server.env, 'archive', 'backups')
+
+
+    def do_help(self, s):
+        if s == '': self.onecmd('help help')
+        else:
+            cmd.Cmd.do_help(self, s) 
 
 
     def help_help(self):
@@ -388,6 +405,13 @@ class Snapshot(cmd.Cmd):
         self.server = server
         self.backup_path = os.path.join(self.server.env, 'archive', 'snaps')
 
+
+    def do_help(self, s):
+        if s == '': self.onecmd('help help')
+        else:
+            cmd.Cmd.do_help(self, s) 
+
+
     def help_help(self):
         print '''Snapshot Management Functions 
 
@@ -470,45 +494,6 @@ class Snapshot(cmd.Cmd):
         '''
         for filename in os.listdir(self.backup_path):
             print filename[:-4]
-
-
-class WorldCLI(cmd.Cmd):
-    server = None
-    
-    def __init__(self, server):
-        cmd.Cmd.__init__(self)
-        self.server = server
-
-
-    def help_help(self):
-        print '''World Management Functions
-
-        Allows for the ability to add or remove worlds from the managed world
-        list within baskit.  This is generally not needed unless the server is
-        configured to use Ramdisks.
-
-        add [WORLD_NAME]    Adds the world to the configuration
-
-        rm  [WORLD_NAME]    Removes the word from the configuration.
-        '''
-    
-
-    def do_add(self, s):
-        '''add [world_name]
-        Adds the world name specified to the baskit coonfiguration.  This is
-        needed in order for baskit to be able to backup and restore world
-        backups & manage ramdisks.
-        '''
-        self.server.world_add(s)
-    
-
-    def do_rm(self, s):
-        '''rm [world name]
-        Removes the world name specified from the list of worlds that the
-        current server configuration can see.  Configuration artifacts may
-        still exist, however are no longer needed in the configuration file.
-        '''
-        self.server.world_rm(s)
 
 
 slogans = [

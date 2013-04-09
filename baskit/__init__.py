@@ -1,7 +1,6 @@
 import mc
 import screen
 import server
-import world
 import cli
 
 __version__ = cli.__version__

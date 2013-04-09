@@ -6,8 +6,6 @@ import datetime
 from zipfile import ZipFile
 from commands import getoutput as run
 from ConfigParser import ConfigParser
-
-from world import World
 import mc
 import screen
 import config
@@ -78,6 +76,7 @@ class Server(object):
         self.min_mem = conf.get(section, 'min_mem')
         self.max_mem = conf.get(section, 'max_mem')
         self.logging = conf.getboolean(section, 'screen_log')
+        self.termout = conf.getboolean(section, 'terminal_out')
         
         # Linking in the worlds that we are aware of to the server
         # configuration.  This is normally entirely optional unless you would
@@ -85,7 +84,7 @@ class Server(object):
         # use ramdisks.
         for world_name in conf.get(section, 'worlds').split(','):
             world_name = world_name.strip()
-            self.worlds.append(World(world_name))
+            self.worlds.append(world_name)
     
 
     def set_config(self):
@@ -115,14 +114,8 @@ class Server(object):
         conf.set(section, 'max_mem', self.max_mem)
         conf.set(section, 'java_args', self.java_args)
         conf.set(section, 'screen_log', self.logging)
-        
-        # Now to get the list of world names that are configured with this
-        # server and add them to the 'worlds' option in the configuration
-        # stanza.
-        wnames = []
-        for world in self.worlds:
-            wnames.append(world.name)
-        conf.set(section, 'worlds', ', '.join(wnames))
+        conf.set(section, 'terminal_out', self.termout)
+        conf.set(section, 'worlds', ', '.join(self.worlds))
         
         # Lastly, we need to write the config file to disk.
         with open(self._config_file, 'wb') as configfile:
@@ -199,8 +192,7 @@ class Server(object):
             # Next we will run the per-world initialization.  Normally this
             # shouldn't do anything, however if the worlds are stored on
             # ramdisks then there will be some useful setup stuff happening.
-            for world in self.worlds:
-                world.init()
+            self.prsync()
             
             # Now just to setup all the variables, determine which java we
             # will be running, and to build the bash command that we will send
@@ -232,8 +224,7 @@ class Server(object):
         # are ramdisk worlds, then we will be performing some actions here in
         # order to properly cleanup and make sure all the ramdisk data is
         # synced.
-        for world in self.worlds:
-            world.cleanup()
+        self.rpsync()
     
 
     def players(self):
@@ -418,42 +409,54 @@ class Server(object):
             zfile = ZipFile(os.path.join(self.env, 'archive', 'backups',
                                          '%s.zip' % backup_name))
             zfile.extractall(world_path)
-            
-            # Lastly lets check to see if this world name exists in our config
-            # and create the world object if needed.
-            exists = False
-            if not any(world_name == world.name for world in self.worlds):
-                self.worlds.append(World(world_name))
-                self.set_config()
             return True
         else:
             return False
+
+
+    def prsync(self, worlds=None):
+        '''prsync
+        Performs a sync from the persistant data to the ramdisk
+        '''
+        if worlds == None:
+            worlds = self.worlds
+        if self.ramdisk:
+            for world in worlds:
+            self._sync(os.path.join(self.env, 'persistant', world),
+                       os.path.join(self.env, 'env', world))
     
 
-    def world_add(self, world_name):
-        '''world_add [world name]
-        Adds a new world to the running configuration.
+    def rpsync(self, worlds=None):
+        '''rpsync
+        Performs a sync from the ramdisk to the persistant data
         '''
-        self.worlds.append(World(world_name))
-        self.set_config()
+        if worlds == None:
+            worlds = self.worlds
+        if self.ramdisk:
+            for world in worlds:
+                self._sync(os.path.join(self.env, 'env', world),
+                           os.path.join(self.env, 'persistant', world))
     
 
-    def world_rm(self, world_name):
-        '''world_rm [world name]
-        Removes the specified world from the running server config.  The
-        configuration data for this world will still exist, however will be
-        removed from the list of active worlds that the server is talking to.
+    def _sync(self, from_path, to_path):
+        '''Internal Function
+        Convenience function for rsyncing.  Will use a lockfile with the
+        world name to prevent multipe syncs from occuring at the same time to
+        the same files.
         '''
-        for world in self.worlds:
-            if world.name == world_name:
-                self.worlds.remove(world)
-        self.set_config()
-    
-
-    def world_get(self, world_name):
-        '''world_get [world name]
-        Returns the world of the specified name.
-        '''
-        for world in self.worlds:
-            if world_name == world.name:
-                return world
+        rsync_cmd = 'rsync -r -t -v %s %s' % (from_path, to_path)
+        world = os.path.split(from_path)[1]
+        lockfile = os.path.join(self.env, 'persistant', '%s.lock' % world)
+        
+        # Wait for the lockfile to be released if one exists
+        while os.path.exists(lockfile):
+            time.sleep(0.1)
+        
+        # Create the lockfile
+        lf = open(lockfile, 'w').close()
+        
+        # Run the Rsync
+        run(rsync_cmd)
+        
+        # Remove the lockfile
+        os.remove(lockfile)

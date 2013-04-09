@@ -26,17 +26,6 @@ server_build    = 1.0
 min_mem         = 1024
 max_mem         = 1024
 screen_log      = no
+terminal_out    = yes
 worlds          = world, world_nether, world_the_end
-
-[World: world]
-ramdisk         = no
-automount       = no
-
-[World: world_nether]
-ramdisk         = no
-automount       = no
-
-[World: world_the_end]
-ramdisk         = no
-automount       = no
 '''
