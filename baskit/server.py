@@ -77,6 +77,7 @@ class Server(object):
         self.max_mem = conf.get(section, 'max_mem')
         self.logging = conf.getboolean(section, 'screen_log')
         self.termout = conf.getboolean(section, 'terminal_out')
+        self.ramdisk = conf.getboolean(section, 'ramdisk')
         
         # Linking in the worlds that we are aware of to the server
         # configuration.  This is normally entirely optional unless you would
@@ -115,6 +116,7 @@ class Server(object):
         conf.set(section, 'java_args', self.java_args)
         conf.set(section, 'screen_log', self.logging)
         conf.set(section, 'terminal_out', self.termout)
+        conf.set(section, 'ramdisk', self.ramdisk)
         conf.set(section, 'worlds', ', '.join(self.worlds))
         
         # Lastly, we need to write the config file to disk.
