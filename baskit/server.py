@@ -424,7 +424,7 @@ class Server(object):
             worlds = self.worlds
         if self.ramdisk:
             for world in worlds:
-                self._check_path(os.path.join(self.env, 'env', world)
+                self._check_path(os.path.join(self.env, 'env', world))
                 self._check_path(os.path.join(self.env, 'persistent', world))
                 self._sync(os.path.join(self.env, 'persistent', world),
                            os.path.join(self.env, 'env', world))
@@ -438,7 +438,7 @@ class Server(object):
             worlds = self.worlds
         if self.ramdisk:
             for world in worlds:
-                self._check_path(os.path.join(self.env, 'env', world)
+                self._check_path(os.path.join(self.env, 'env', world))
                 self._check_path(os.path.join(self.env, 'persistent', world))
                 self._sync(os.path.join(self.env, 'env', world),
                            os.path.join(self.env, 'persistent', world))
