@@ -422,8 +422,8 @@ class Server(object):
             worlds = self.worlds
         if self.ramdisk:
             for world in worlds:
-            self._sync(os.path.join(self.env, 'persistant', world),
-                       os.path.join(self.env, 'env', world))
+                self._sync(os.path.join(self.env, 'persistant', world),
+                           os.path.join(self.env, 'env', world))
     
 
     def rpsync(self, worlds=None):
