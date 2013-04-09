@@ -7,7 +7,7 @@ def send(name, text, newline=True):
     '''
     if newline:
         text = text + '\n'
-    run('screen -S %s -p0 -X stuff \'%s\n\'' % (name, text))
+    run('screen -S %s -p0 -X stuff \'%s\'' % (name, text))
 
  
 def exists(name):
