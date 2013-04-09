@@ -418,27 +418,35 @@ class Server(object):
 
     def prsync(self, worlds=None):
         '''prsync
-        Performs a sync from the persistant data to the ramdisk
+        Performs a sync from the persistent data to the ramdisk
         '''
         if worlds == None:
             worlds = self.worlds
         if self.ramdisk:
             for world in worlds:
-                self._sync(os.path.join(self.env, 'persistant', world),
+                self._check_path(os.path.join(self.env, 'env', world)
+                self._check_path(os.path.join(self.env, 'persistent', world))
+                self._sync(os.path.join(self.env, 'persistent', world),
                            os.path.join(self.env, 'env', world))
     
 
     def rpsync(self, worlds=None):
         '''rpsync
-        Performs a sync from the ramdisk to the persistant data
+        Performs a sync from the ramdisk to the persistent data
         '''
         if worlds == None:
             worlds = self.worlds
         if self.ramdisk:
             for world in worlds:
+                self._check_path(os.path.join(self.env, 'env', world)
+                self._check_path(os.path.join(self.env, 'persistent', world))
                 self._sync(os.path.join(self.env, 'env', world),
-                           os.path.join(self.env, 'persistant', world))
+                           os.path.join(self.env, 'persistent', world))
     
+
+    def _check_path(self, path):
+        if not os.path.exists(path):
+            os.makedirs(path)
 
     def _sync(self, from_path, to_path):
         '''Internal Function
@@ -446,9 +454,9 @@ class Server(object):
         world name to prevent multipe syncs from occuring at the same time to
         the same files.
         '''
-        rsync_cmd = 'rsync -r -t -v %s %s' % (from_path, to_path)
+        rsync_cmd = 'rsync -r -t %s %s' % (from_path, to_path)
         world = os.path.split(from_path)[1]
-        lockfile = os.path.join(self.env, 'persistant', '%s.lock' % world)
+        lockfile = os.path.join(self.env, 'persistent', '%s.lock' % world)
         
         # Wait for the lockfile to be released if one exists
         while os.path.exists(lockfile):
