@@ -32,7 +32,3 @@ __Whats not working__:
 __Bugs__:
 
 * Player listing seems to be constantly breaking.  This is mostly due to the fact that bukkit and vanilla represent the data differently, and that this representation is constantly changing.
-
-__ToDo__:
-
-
