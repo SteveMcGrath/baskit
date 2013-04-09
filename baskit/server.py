@@ -454,7 +454,7 @@ class Server(object):
         world name to prevent multipe syncs from occuring at the same time to
         the same files.
         '''
-        rsync_cmd = 'rsync -r -t %s %s' % (from_path, to_path)
+        rsync_cmd = 'rsync -r -t %s/ %s/' % (from_path, to_path)
         world = os.path.split(from_path)[1]
         lockfile = os.path.join(self.env, 'persistent', '%s.lock' % world)
         
