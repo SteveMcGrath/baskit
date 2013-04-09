@@ -25,6 +25,7 @@ class BaskitCLI(cmd.Cmd):
         for item in [self.server.env,
                      os.path.join(self.server.env, 'archive', 'backups'),
                      os.path.join(self.server.env, 'archive', 'snaps'),
+                     os.path.join(self.server.env, 'persistent')
                      os.path.join(self.server.env, 'env')]:
             if not os.path.exists(item):
                 os.makedirs(item)
@@ -86,7 +87,7 @@ class BaskitCLI(cmd.Cmd):
                                     "snapshot" will present it's help.
 
         sync                        Handles syncing to/from ramdisk and
-                                    persistant storage if ramdisk support is
+                                    persistent storage if ramdisk support is
                                     enabled (disabled by default)
         '''
     
@@ -266,21 +267,21 @@ class BaskitCLI(cmd.Cmd):
 
     def do_sync(self, s):
         '''sync [destination] [world1, [world2, world3]]
-        Handles synchronization between the persisitant and ramdisk storage.
+        Handles synchronization between the persistent and ramdisk storage.
         By default it will sync all of the configured worlds to the destination
-        data store specified (e.g. specifying ramdisk will sync from persistant
+        data store specified (e.g. specifying ramdisk will sync from persistent
         to ramdisk).  Optionally you can specify specific worlds that you would
         like to sync.  These are comma-deliited.
 
         destination                     This is the destination of the sync.
-                                        Can either be ramdisk or persistant.
+                                        Can either be ramdisk or persistent.
         '''
         opts = s.split()
         worlds = None
         if len(opts) > 1:
             worlds = [a.strip() for a in ''.join(opts[1:]).split(',')]
         if opts[0] == 'ramdisk': self.server.prsync(worlds)
-        if opts[0] == 'persistant': self.server.rpsync(worlds)
+        if opts[0] == 'persistent': self.server.rpsync(worlds)
 
 
 class Backup(cmd.Cmd):
