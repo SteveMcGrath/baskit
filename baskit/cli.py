@@ -25,7 +25,7 @@ class BaskitCLI(cmd.Cmd):
         for item in [self.server.env,
                      os.path.join(self.server.env, 'archive', 'backups'),
                      os.path.join(self.server.env, 'archive', 'snaps'),
-                     os.path.join(self.server.env, 'persistent')
+                     os.path.join(self.server.env, 'persistent'),
                      os.path.join(self.server.env, 'env')]:
             if not os.path.exists(item):
                 os.makedirs(item)
