@@ -114,7 +114,7 @@ class BaskitCLI(cmd.Cmd):
         if not self.server.running():
             print 'Server must be running for this command to function'
         else:
-            print 'Players Online: %s' % self.server.players()
+            print 'Players Online: %s' % ', '.join(self.server.players())
     
 
     def do_start(self, s):

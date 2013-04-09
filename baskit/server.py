@@ -124,20 +124,19 @@ class Server(object):
             conf.write(configfile)
         
     
-    def command(self, command, restring=None):
+    def command(self, command, *restring):
         '''command [command]
         Sends the specified command to the server console and will optionally
         wait for a given regex to return a match from the server.log before
         returning.
         '''
         
-        if restring is not None:
+        if len(restring) > 0:
             # If a regex was specified for interactivity, then we will need
             # to open the server.log file and seek to the end of the file
             # before we actually do anything.  Once we send the command that
             # was specified we will use the end of the file as a starting
             # point for the parsing.
-            relog = re.compile(restring)
             logfile = open(os.path.join(self.env, 'env', 'server.log'), 'r')
             size = os.stat(os.path.join(self.env, 'env', 'server.log'))[6]
             logfile.seek(size)
@@ -145,23 +144,25 @@ class Server(object):
         # Sending the command to the screen session
         screen.send('mc_%s' % self.name, command)
         
-        if restring is not None:
+        if len(restring) > 0:
             # Now we will start parsing through all of the log data that the
             # server is returning, using the now old EOF as a starting point.
             # We will run the regex that we had compiled to the relog variable
             # on every line until we get a match, then return those matches.
-            found = False
-            while not found:
+            found = 0
+            relog = re.compile(restring[found])
+            while found < len(restring):
                 where = logfile.tell()
                 line = logfile.readline()
                 if not line:
                     time.sleep(0.1)
                     logfile.seek(where)
                 else:
-                    if len(relog.findall(line)) > 0:
-                        found = True
+                    data = re.compile(restring[found]).findall(line)
+                    if len(data) > 0:
+                        found += 1
             logfile.close()
-            return relog.findall(line)
+            return data
         
         # If there was no regex specified, then there is nothing to return.
         return None
@@ -233,9 +234,14 @@ class Server(object):
         '''players
         Returns the list of currently commected players
         '''
-        repl = re.compile(r' ([^,]*)')
-        line = self.command('list', r'players online:(.*)')[0].strip('\n')
-        players = repl.findall(line)
+        strings = {
+            'vanilla': [r'players online:', r'INFO\](.*)$'],
+            'bukkit': [r'players online:', r'(.*)$'],
+        }
+        line = self.command('list', *strings[self.server_type])[0]
+        line = line.strip('\n').strip('\x1b[m')
+        players = [a.strip() for a in line.split(',')]
+        if players[0] == '': players = []
         return players
     
 
