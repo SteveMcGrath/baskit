@@ -195,7 +195,7 @@ class BaskitCLI(cmd.Cmd):
         print 'Type   : %s' % self.server.server_type
         print 'Branch : %s' % self.server.server_branch
         print 'Build  : %s' % self.server.server_build
-        print 'Worlds : %s' % ', '.join(self.worlds)
+        print 'Worlds : %s' % ', '.join(self.server.worlds)
 
 
     def do_status(self, s):
