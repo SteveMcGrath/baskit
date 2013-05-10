@@ -27,10 +27,6 @@ __Whats Working__:
 
 * Most Everything
 
-__Whats not working__:
+__ToDo__:
 
-* Ramdisk support hasn't been tested and is likely to be removed.
-
-__Bugs__:
-
-* Player listing seems to be constantly breaking.  This is mostly due to the fact that bukkit and vanilla represent the data differently, and that this representation is constantly changing.
+* BukGet Plugin management support.
