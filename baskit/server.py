@@ -288,13 +288,10 @@ class Server(object):
         
         # Now walk through the worlds until we find a name match and run the
         # compress_folder function to generate the zip file archive.
-        for world in self.worlds:
-            if world.name == world_name:
-                world.rpsync()
-                compress_folder(os.path.join(self.env, 'archive', 'backups', 
-                                             '%s.zip' % backup_name), 
-                                os.path.join(self.env, 'env', world_name),
-                                os.path.join(self.env, 'env', world_name))
+        compress_folder(os.path.join(self.env, 'archive', 'backups', 
+                                     '%s.zip' % backup_name), 
+                        os.path.join(self.env, 'env', world_name),
+                        os.path.join(self.env, 'env', world_name))
     
 
     def env_snapshot(self, snap_name=None):
@@ -311,10 +308,16 @@ class Server(object):
         # of the files for each world.  This is needed as we do not want to
         # archive the world data as part of a snapshot.
         excludes = []
-        for world in self.worlds:
-            world_path = os.path.join(self.env, 'env', world.name)
-            for dirname, dirs, files in os.walk(world_path):
-                for f in files:
+        worlds = []
+        for dirname, dirs, files in os.walk(os.path.join(self.env, 'env')):
+            for f in files:
+                exclude = False
+                if f == 'level.dat':
+                    worlds.append(dirname)
+                for world in worlds:
+                    if world in dirname:
+                        exclude = True
+                if exclude:
                     excludes.append(os.path.join(dirname, f))
         
         # And now we run the compress_folder function to generate the archive.
