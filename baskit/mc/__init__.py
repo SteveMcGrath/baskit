@@ -1,7 +1,7 @@
 import bukkit
 import vanilla
 import spout
-import canary
+import spigot
 
 def download(server_type='vanilla', build_type='stable'):
     '''download [server_type], [build_type]
@@ -10,9 +10,9 @@ def download(server_type='vanilla', build_type='stable'):
     told to download any of the server binaries below:
     
     vanilla (stable)
-    bukkit (stable, test, dev, [build_no])
-    spout (NA)
-    canary (NA)
+    bukkit (rb, beta, dev, [build_no])
+    spout (stable, test, dev, [build_no])
+    spigot (stable, dev, [build_no])
     '''
     
     if server_type == 'vanilla':
@@ -21,7 +21,7 @@ def download(server_type='vanilla', build_type='stable'):
         return bukkit.download(build_type)
     if server_type == 'spout':
         return spout.download(build_type)
-    #if server_type == 'canary':
-    #    return canary.download(build_type)
+    if server_type == 'spigot':
+        return spigot.download(build_type)
     else:
         return None
