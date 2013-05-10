@@ -312,8 +312,11 @@ class Server(object):
         for dirname, dirs, files in os.walk(os.path.join(self.env, 'env')):
             for f in files:
                 exclude = False
-                if f == 'level.dat':
+                if f in ['level.dat', 'level.dat_old']:
                     worlds.append(dirname)
+        for dirname, dirs, files in os.walk(os.path.join(self.env, 'env')):
+            for f in files:
+                exclude = False
                 for world in worlds:
                     if world in dirname:
                         exclude = True
