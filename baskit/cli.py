@@ -8,7 +8,7 @@ import sys
 from random import randint as random
 from server import Server
 
-__version__ = '0.2.3.1'
+__version__ = '0.2.4'
 __author__ = 'Steven McGrath'
 __email__ = 'steve@chigeek.com'
 
