@@ -8,7 +8,7 @@ import sys
 from random import randint as random
 from server import Server
 
-__version__ = '0.2.2.0b'
+__version__ = '0.2.3.1'
 __author__ = 'Steven McGrath'
 __email__ = 'steve@chigeek.com'
 
@@ -334,15 +334,10 @@ class Backup(cmd.Cmd):
         if len(cmd_in) > 1:
             name = cmd_in[1]
         else:
-            name = None
-        
-        if any(world == witems.name for witems in self.server.worlds):
-            print 'Starting world backup...'
-            self.server.world_backup(world, name)
-            print 'World backup complete.'
-        else:
-            print ('Not a configured world.  If this world exists,\n',
-                   ' please add it to the configuration with world add')
+            name = None  
+        print 'Starting world backup...'
+        self.server.world_backup(world, name)
+        print 'World backup complete.'
     
 
     def do_remove(self, s):
