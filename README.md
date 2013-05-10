@@ -18,8 +18,18 @@ Baskit is a UNIX-specific Minecraft Server manager.  It uses a screen session to
 
 * Install pre-reqs: screen & java
 * Install Baskit via pip or easy_install: pip install baskit
-* Run baskit to generate env in the CWD: baskit server
+* Create a base location for your minecraft server (e.g. /opt/minecraft): mkdir /opt/minecraft
+* Change into the new directory: cd /opt/minecraft
+* Run baskit to create the directory structure: baskit server
 * Optional: Move baskit.conf to /etc or to ~/.baskit.conf
+* Optional: adjust the environment line in baskit.conf to match your base folder (e.g. /opt/minecraft)
+
+### Migrating an existing installation into baskit
+
+* Once you have the baskit base structure in place, its simply a matter of copying your server data into the env folder. (e.g. /opt/minecraft/env)
+* Also, either modify the binary config line or rename your existing server binary to server.jar
+
+NOTE: you can also modify the server_* config lines to match your existing server binary's, as they will not be updated until you update the server within baskit.
 
 ### Status
 
