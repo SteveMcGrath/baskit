@@ -90,6 +90,8 @@ class BaskitCLI(cmd.Cmd):
         sync                        Handles syncing to/from ramdisk and
                                     persistent storage if ramdisk support is
                                     enabled (disabled by default)
+
+        plugin                      Stuff will go here eventually.....
         '''
     
 
@@ -263,6 +265,20 @@ class BaskitCLI(cmd.Cmd):
             Snapshot(self.server).onecmd(s)
         else:
             Snapshot(self.server).onecmd('help')
+
+
+    def do_plugin(self, s):
+        '''snapshot
+        Handles all snapshot functions including management of all snapshots.
+        For more information run:
+        
+        snapshot help
+        '''
+        msg = 'type exit to return the main console'
+        if len(s) > 1:
+            plugins.Plugin(self.server).onecmd(s)
+        else:
+            plugins.Plugin(self.server).onecmd('help')
 
 
     def do_sync(self, s):
