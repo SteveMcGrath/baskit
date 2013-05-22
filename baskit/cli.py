@@ -5,6 +5,7 @@ import getopt
 import os
 import datetime
 import sys
+import plugins
 from random import randint as random
 from server import Server
 
