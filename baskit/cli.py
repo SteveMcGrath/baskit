@@ -276,9 +276,9 @@ class BaskitCLI(cmd.Cmd):
         '''
         msg = 'type exit to return the main console'
         if len(s) > 1:
-            plugins.Plugin(self.server).onecmd(s)
+            plugins.Plugins(self.server).onecmd(s)
         else:
-            plugins.Plugin(self.server).onecmd('help')
+            plugins.Plugins(self.server).onecmd('help')
 
 
     def do_sync(self, s):
