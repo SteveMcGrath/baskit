@@ -6,7 +6,7 @@ from bukget import api
 from hashlib import md5
 from ConfigParser import ConfigParser
 from zipfile import ZipFile 
-from StrongIO import StringIO
+from StringIO import StringIO
 
 class Plugins(cmd.Cmd):
     def __init__(self, server):
@@ -175,7 +175,7 @@ class Plugins(cmd.Cmd):
                             enabled=True)
                         if p and p['md5'] != version['md5']:
                             notes.append('Manually Updated')
-                self.display_plugin(plug['plugin_name']lower(), *notes)
+                self.display_plugin(plug['plugin_name'].lower(), *notes)
 
 
     def do_search(self, s):
@@ -244,6 +244,8 @@ class Plugins(cmd.Cmd):
             return
         paths = []
         if raw_input('Delete %s ? (NO/yes)').lower() in ['y', 'yes']:
+            pass
+        pass
     
 
     def do_enable(self, s):
