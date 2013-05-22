@@ -42,6 +42,26 @@ class Plugins(cmd.Cmd):
             return None
 
 
+    def delete_plugin(self, name):
+        '''
+        Removes the plugin from the server.
+        '''
+        plug = self.get_plugin(name)
+
+        # We are setting these here as I'm lazy and we will be using these a
+        # lot in this function.
+        pjoin = os.path.join
+        exists = os.path.exists
+
+        if exists(pjoin(self.plugin_path, plug['jar'])):
+            os.remove(pjoin(self.plugin_path, plug['jar']))
+        if exists(pjoin(self.plugin_path, plug['jar'][:-4])):
+            shutil.rmtree(pjoin(self.plugin_path, plug['jar'][:-4]))
+        if exists(pjoin('%s_diabled' % self.plugin_path, plug['jar'])):
+            os.remote(pjoin('%s_diabled' % self.plugin_path, plug['jar']))
+
+
+
     def plugin_listing(self):
         '''
         Returns a list of dictionaries with the installed plugins that baskit
@@ -109,12 +129,33 @@ class Plugins(cmd.Cmd):
         print '%-20s %-10s %s' % (conf['name'], conf['version'], ', '.join(opts))
 
 
-    def install(plugin, version):
+    def install(self, plugin, version):
         '''
         Installs or Updates a Plugin.
         '''
         plug = api.plugin_details(self.stype, plugin, version)
-        
+        pname = plug['versions'][0]['filename']
+        data = api.plugin_download(self.stype, plugin, version)
+        if pname[-3:].lower() == 'jar':
+            with open(os.path.join(self.plugin_path, 
+                      pname[:-3] + 'jar'), 'wb') as jar:
+                jar.write(data)
+        if pname[-3:].lower() == 'zip':
+            dataobj = StringIO(data)
+            zfile = ZipFile(StringIO())
+            zfile.extractall(self.plugin_path)
+            print '\n'.join([
+                'NOTE: As this plugin was bundled as a zip file, it\'s',
+                '      impossible to determine if the plugin was installed',
+                '      correctly.  Please check the plugin installtion to be',
+                '      sure that everything is set up correctly.'])
+            dataobj.close()
+        self.save_plugin(plug['plugin_name'].lower(),
+                         jar=pname[:-3] + 'jar',
+                         bukget=plug['slug'],
+                         md5=filehash,
+                         version=version['version'],
+                         enabled=True)
 
 
     def do_help(self, s):
@@ -187,7 +228,7 @@ class Plugins(cmd.Cmd):
             'action': 'like',
             'value': s
         })
-        print '\n'.join(['%-15s %-15s %s' % (p['plugin_name'], p['slug'], p['description']) for p in results])
+        print '\n'.join(['%-30s [%-30s]\n\t%s\n' % (p['plugin_name'], p['slug'], p['description']) for p in results])
 
 
     def do_list(self, s):
@@ -242,10 +283,8 @@ class Plugins(cmd.Cmd):
         if self.server.running():
             print 'Please shutdown the server before permanently removing plugins.'
             return
-        paths = []
         if raw_input('Delete %s ? (NO/yes)').lower() in ['y', 'yes']:
-            pass
-        pass
+            self.delete_plugin(s)
     
 
     def do_enable(self, s):
