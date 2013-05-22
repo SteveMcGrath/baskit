@@ -167,7 +167,7 @@ class Plugins(cmd.Cmd):
                 notes = []
                 for version in plug['versions']:
                     if version['md5'] == filehash:
-                        self.save_plugin(plug['plugin_name']lower(),
+                        self.save_plugin(plug['plugin_name'].lower(),
                             jar=filename,
                             bukget=plug['slug'],
                             md5=filehash,
