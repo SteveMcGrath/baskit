@@ -304,6 +304,9 @@ class Plugins(cmd.Cmd):
         if self.server.running():
             print 'Please shutdown the server before permanently removing plugins.'
             return
+        if self.get_plugin(s) is None:
+            print 'Invalid Plugin Name...'
+            return
         if raw_input('Delete %s ? (NO/yes) :' % s).lower() in ['y', 'yes']:
             self.delete_plugin(s)
     
