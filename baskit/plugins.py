@@ -99,7 +99,7 @@ class Plugins(cmd.Cmd):
         query BukGet to look for a match.  If we do find a match we will add
         the plugin to your list of managed plugins within baskit.
         '''
-        return bukget.orm.search({
+        return api.search({
             'field': 'versions.md5', 
             'action': '=',
             'value': self.hash_file(filename)
