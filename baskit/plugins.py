@@ -59,6 +59,9 @@ class Plugins(cmd.Cmd):
             shutil.rmtree(pjoin(self.plugin_path, plug['jar'][:-4]))
         if exists(pjoin('%s_diabled' % self.plugin_path, plug['jar'])):
             os.remote(pjoin('%s_diabled' % self.plugin_path, plug['jar']))
+        conf = ConfigParser()
+        conf.read(config.get_config_file())
+        conf.remove_section('Plugin: %s' % name.lower())
         print 'Plugin %s removed and (hopefully) all associated data.' % plug['name']
 
 
@@ -296,7 +299,7 @@ class Plugins(cmd.Cmd):
         if self.server.running():
             print 'Please shutdown the server before permanently removing plugins.'
             return
-        if raw_input('Delete %s ? (NO/yes)').lower() in ['y', 'yes']:
+        if raw_input('Delete %s ? (NO/yes) :' % s).lower() in ['y', 'yes']:
             self.delete_plugin(s)
     
 
