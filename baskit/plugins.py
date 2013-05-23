@@ -29,7 +29,7 @@ class Plugins(cmd.Cmd):
         stanza = 'Plugin: %s' % name.lower()
         conf = ConfigParser()
         conf.read(config.get_config_file())
-        if config.has_section(stanza):
+        if conf.has_section(stanza):
             return {
                 'name': conf.get(stanza, 'name'),
                 'jar': conf.get(stanza, 'jar'),
