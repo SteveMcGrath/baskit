@@ -128,13 +128,14 @@ class Plugins(cmd.Cmd):
         '''
         opts = list(opts)
         conf = self.get_plugin(plugin)
-        ret = api.plugin_details(self.stype, conf['bukget'])
-        if ret is not None and check:
-            current = ret['versions'][0]
-            for version in ret['versions']:
-                if conf['version'] == version['version']:
-                    if current['date'] > version['date']:
-                        opts.append('Current: %s' % current['version'])
+        if check:
+            ret = api.plugin_details(self.stype, conf['bukget'])
+            if ret is not None:
+                current = ret['versions'][0]
+                for version in ret['versions']:
+                    if conf['version'] == version['version']:
+                        if current['date'] > version['date']:
+                            opts.append('Current: %s' % current['version'])
         print '%-20s %-10s %s' % (conf['name'], conf['version'], ', '.join(opts))
 
 
