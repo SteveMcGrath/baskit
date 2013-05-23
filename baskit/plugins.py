@@ -122,14 +122,14 @@ class Plugins(cmd.Cmd):
         return md5hash.hexdigest()
 
 
-    def display_plugin(self, plugin, *opts):
+    def display_plugin(self, plugin, check=False, *opts):
         '''
         Outputs to Screen information about the plugin.
         '''
         opts = list(opts)
         conf = self.get_plugin(plugin)
         ret = api.plugin_details(self.stype, conf['bukget'])
-        if ret is not None:
+        if ret is not None and check:
             current = ret['versions'][0]
             for version in ret['versions']:
                 if conf['version'] == version['version']:
@@ -235,7 +235,7 @@ class Plugins(cmd.Cmd):
                             enabled=True)
                         if p and p['md5'] != version['md5']:
                             notes.append('Manually Updated')
-                self.display_plugin(plug['plugin_name'].lower(), *notes)
+                self.display_plugin(plug['plugin_name'].lower(), True, *notes)
 
 
     def do_search(self, s):
@@ -253,12 +253,14 @@ class Plugins(cmd.Cmd):
 
 
     def do_list(self, s):
-        '''list 
+        '''list [check]
         Lists the currently installed plugins and their versions.  Will also 
         note which plugins have updates available.
         '''
+        check = False
+        if s == 'check': check = True
         for plugin in self.plugin_listing():
-            self.display_plugin(plugin['name'])
+            self.display_plugin(plugin['name'], check=check)
 
 
     def do_update(self, s):
