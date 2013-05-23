@@ -122,7 +122,7 @@ class Plugins(cmd.Cmd):
         Outputs to Screen information about the plugin.
         '''
         conf = self.get_plugin(plugin)
-        ret = api.plugin_details(self.stype, conf['slug'])
+        ret = api.plugin_details(self.stype, conf['bukget'])
         if ret is not None:
             current = ret['versions'][0]
             for version in ret['versions']:
@@ -191,7 +191,7 @@ class Plugins(cmd.Cmd):
                     if plugin['jar'] == filename:
                         p = plugin
                 if p:
-                    plug = api.plugin_details(self.stype, p['slug'])
+                    plug = api.plugin_details(self.stype, p['bukget'])
                 else:
                     plugs = self.get_plugin_info(filepath)
                     if len(plugs) == 0:
