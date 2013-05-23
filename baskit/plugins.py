@@ -143,6 +143,9 @@ class Plugins(cmd.Cmd):
         Installs or Updates a Plugin.
         '''
         plug = api.plugin_details(self.stype, plugin, version)
+        if plug == None:
+            print 'Not a Valid BukGet Plugin Name...'
+            return
         pname = plug['versions'][0]['filename']
         data = api.plugin_download(self.stype, plugin, version)
         if pname[-3:].lower() == 'jar':
