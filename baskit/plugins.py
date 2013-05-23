@@ -5,7 +5,7 @@ import shutil
 from bukget import api
 from hashlib import md5
 from ConfigParser import ConfigParser
-from zipfile import ZipFile 
+from zipfile import ZipFile, BadZipfile
 from StringIO import StringIO
 
 class Plugins(cmd.Cmd):
@@ -147,7 +147,11 @@ class Plugins(cmd.Cmd):
         if pname[-3:].lower() == 'zip':
             dataobj = StringIO()
             dataobj.write(data)
-            zfile = ZipFile(dataobj)
+            try:
+                zfile = ZipFile(dataobj)
+            except BadZipfile:
+                print 'ERROR: Corrupt Zip File.  Could Not Install'
+                return
             zfile.extractall(self.plugin_path)
             print '\n'.join([
                 'NOTE: As this plugin was bundled as a zip file, it\'s',
@@ -161,7 +165,7 @@ class Plugins(cmd.Cmd):
                          md5=plug['versions'][0]['md5'],
                          version=plug['versions'][0]['version'],
                          enabled=True)
-        print 'Plugin %s installed' % plug['plugin_name']
+        print 'Plugin %s/%sinstalled' % (plug['plugin_name'], plug['versions'][0]['version'])
 
 
 
