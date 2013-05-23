@@ -59,6 +59,7 @@ class Plugins(cmd.Cmd):
             shutil.rmtree(pjoin(self.plugin_path, plug['jar'][:-4]))
         if exists(pjoin('%s_diabled' % self.plugin_path, plug['jar'])):
             os.remote(pjoin('%s_diabled' % self.plugin_path, plug['jar']))
+        print 'Plugin %s removed and (hopefully) all associated data.' % plug['name']
 
 
 
@@ -84,6 +85,8 @@ class Plugins(cmd.Cmd):
         conf = ConfigParser()
         conf.read(config.get_config_file())
         settings['name'] = name
+        if not conf.has_section(stanza):
+            conf.add_section(stanza)
         for item in settings:
             conf.set(stanza, item, settings[item])
         with open(config.get_config_file(), 'w') as cfile:
@@ -156,6 +159,8 @@ class Plugins(cmd.Cmd):
                          md5=plug['versions'][0]['md5'],
                          version=plug['versions'][0]['version'],
                          enabled=True)
+        print 'Plugin %s installed' % plug['plugin_name']
+
 
 
     def do_help(self, s):
