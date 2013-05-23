@@ -121,7 +121,7 @@ class Plugins(cmd.Cmd):
         '''
         Outputs to Screen information about the plugin.
         '''
-        conf = get_plugin(plugin)
+        conf = self.get_plugin(plugin)
         ret = api.plugin_details(self.stype, conf['slug'])
         if ret is not None:
             current = ret['versions'][0]
