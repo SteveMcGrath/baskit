@@ -317,7 +317,7 @@ class Plugins(cmd.Cmd):
         into the plugin folder, effectively enabling the plugin.
         '''
         plugin = self.get_plugin(s)
-        if os.path.exists(os.path.join('%s_disabled' % self.plugin_path, plugin['jar'])):
+        if plugin is not None and os.path.exists(os.path.join('%s_disabled' % self.plugin_path, plugin['jar'])):
             shutil.move(os.path.join('%s_disabled' % self.plugin_path, plugin['jar']), 
                         os.path.join(self.plugin_path, plugin['jar']))
             print '%s enabled.  Restart the servert to activate.' % plugin['name']
@@ -334,7 +334,7 @@ class Plugins(cmd.Cmd):
         plugin = self.get_plugin(s)
         if not os.path.exists('%s_disabled' % self.plugin_path):
             os.makedirs('%s_disabled' % self.plugin_path)
-        if os.path.exists(os.path.join(self.plugin_path, plugin['jar'])):
+        if plugin is not None and os.path.exists(os.path.join(self.plugin_path, plugin['jar'])):
             shutil.move(os.path.join(self.plugin_path, plugin['jar']), 
                         os.path.join('%s_disabled' % self.plugin_path, plugin['jar']))
             print '%s disabled.  Restart the server to deactivate.' % plugin['name']
