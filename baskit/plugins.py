@@ -85,7 +85,7 @@ class Plugins(cmd.Cmd):
         conf.read(config.get_config_file())
         settings['name'] = name
         for item in settings:
-            conf.set(stanza, setting, settings[setting])
+            conf.set(stanza, item, settings[item])
         with open(config.get_config_file(), 'w') as cfile:
             conf.write(cfile)
 
@@ -230,7 +230,7 @@ class Plugins(cmd.Cmd):
         })
         print '%-20s %-20s %s' % ('Plugin Name', 'Install Name', 'Description')
         print '%s %s %s' % ('-' * 20, '-' * 20, '-' * 38)
-        print '\n'.join(['%-20s %-20s\n\t%s\n' % (p['plugin_name'], p['slug'], p['description']) for p in results])
+        print '\n'.join(['%-20s %-20s %s' % (p['plugin_name'], p['slug'], p['description']) for p in results])
 
 
     def do_list(self, s):
