@@ -322,6 +322,7 @@ class Plugins(cmd.Cmd):
         if plugin is not None and os.path.exists(os.path.join('%s_disabled' % self.plugin_path, plugin['jar'])):
             shutil.move(os.path.join('%s_disabled' % self.plugin_path, plugin['jar']), 
                         os.path.join(self.plugin_path, plugin['jar']))
+            self.save_plugin(s, status='enabled')
             print '%s enabled.  Restart the servert to activate.' % plugin['name']
         else:
             print '%s is not disabled.' % plugin['name']
@@ -339,6 +340,7 @@ class Plugins(cmd.Cmd):
         if plugin is not None and os.path.exists(os.path.join(self.plugin_path, plugin['jar'])):
             shutil.move(os.path.join(self.plugin_path, plugin['jar']), 
                         os.path.join('%s_disabled' % self.plugin_path, plugin['jar']))
+            self.save_plugin(s, status='disabled')
             print '%s disabled.  Restart the server to deactivate.' % plugin['name']
         else:
             print '%s is not installed.' % plugin['name']
