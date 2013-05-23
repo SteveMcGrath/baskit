@@ -43,21 +43,10 @@ def download(build_type='stable'):
         build = int(title.findall(urlopen(url).read())[0])
     except:
         raise Error('Webpage does not contain version number!')
-    
-    # Now we will download the zip file that we are requesting from CI
-    #data = StringIO()
-    #data.write(urlopen(url + artifact).read())
-    #zfile = ZipFile(data)
-    
-    # Now we will check for the JAR file and return the contents if we find
-    # them.
-    #contents = None
-    #for filename in zfile.namelist():
-    #    if filename[-3:].lower() == 'jar':
-    #        contents = zfile.read(filename)
+
     contents = urlopen(url + artifact).read()
     return {
-        'server_type': 'spout',
+        'server_type': 'spigot',
         'branch': branch,
         'build': build,
         'binary': contents
