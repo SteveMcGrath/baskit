@@ -121,6 +121,7 @@ class Plugins(cmd.Cmd):
         '''
         Outputs to Screen information about the plugin.
         '''
+        opts = list(opts)
         conf = self.get_plugin(plugin)
         ret = api.plugin_details(self.stype, conf['bukget'])
         if ret is not None:
