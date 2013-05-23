@@ -173,7 +173,7 @@ class Plugins(cmd.Cmd):
                          md5=plug['versions'][0]['md5'],
                          version=plug['versions'][0]['version'],
                          enabled=True)
-        print 'Plugin %s/%sinstalled' % (plug['plugin_name'], plug['versions'][0]['version'])
+        print 'Plugin %s/%s installed' % (plug['plugin_name'], plug['versions'][0]['version'])
 
 
 
@@ -317,9 +317,9 @@ class Plugins(cmd.Cmd):
         into the plugin folder, effectively enabling the plugin.
         '''
         plugin = self.get_plugin(s)
-        if os.path.exists(os.path.join('%s_disabled' % self.plugins_path, plugin[1])):
-            shutil.move(os.path.join('%s_disabled' % self.plugins_path, plugin[1]), 
-                        os.path.join(self.plugins_path, plugin[1]))
+        if os.path.exists(os.path.join('%s_disabled' % self.plugin_path, plugin[1])):
+            shutil.move(os.path.join('%s_disabled' % self.plugin_path, plugin[1]), 
+                        os.path.join(self.plugin_path, plugin[1]))
             print '%s enabled.  Restart the servert to activate.' % plugin[0]
         else:
             print '%s is not disabled.' % plugin[0]
@@ -332,11 +332,11 @@ class Plugins(cmd.Cmd):
         be a non-destructive way to troubleshoot potential issues.
         '''
         plugin = self.get_plugin(s)
-        if not os.path.exists('%s_disabled' % self.plugins_path):
-            os.makedirs('%s_disabled' % self.plugins_path)
-        if os.path.exists(os.path.join(self.plugins_path, plugin[1])):
-            shutil.move(os.path.join(self.plugins_path, plugin[1]), 
-                        os.path.join('%s_disabled' % self.plugins_path, plugin[1]))
+        if not os.path.exists('%s_disabled' % self.plugin_path):
+            os.makedirs('%s_disabled' % self.plugin_path)
+        if os.path.exists(os.path.join(self.plugin_path, plugin[1])):
+            shutil.move(os.path.join(self.plugin_path, plugin[1]), 
+                        os.path.join('%s_disabled' % self.plugin_path, plugin[1]))
             print '%s disabled.  Restart the server to deactivate.' % plugin[0]
         else:
             print '%s is not installed.' % plugin[0]
