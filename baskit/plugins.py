@@ -145,7 +145,8 @@ class Plugins(cmd.Cmd):
                       pname[:-3] + 'jar'), 'wb') as jar:
                 jar.write(data)
         if pname[-3:].lower() == 'zip':
-            dataobj = StringIO(data)
+            dataobj = StringIO()
+            dataobj.write(data)
             zfile = ZipFile(StringIO())
             zfile.extractall(self.plugin_path)
             print '\n'.join([
