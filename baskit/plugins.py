@@ -147,7 +147,7 @@ class Plugins(cmd.Cmd):
         if pname[-3:].lower() == 'zip':
             dataobj = StringIO()
             dataobj.write(data)
-            zfile = ZipFile(StringIO())
+            zfile = ZipFile(dataobj)
             zfile.extractall(self.plugin_path)
             print '\n'.join([
                 'NOTE: As this plugin was bundled as a zip file, it\'s',
