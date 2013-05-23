@@ -244,7 +244,7 @@ class Plugins(cmd.Cmd):
         note which plugins have updates available.
         '''
         for plugin in self.plugin_listing():
-            self.display_plugin(plugin)
+            self.display_plugin(plugin['name'])
 
 
     def do_update(self, s):
