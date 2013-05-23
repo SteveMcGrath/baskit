@@ -62,6 +62,8 @@ class Plugins(cmd.Cmd):
         conf = ConfigParser()
         conf.read(config.get_config_file())
         conf.remove_section('Plugin: %s' % name.lower())
+        with open(config.get_config_file(), 'w') as cfile:
+            conf.write(cfile)
         print 'Plugin %s removed and (hopefully) all associated data.' % plug['name']
 
 
