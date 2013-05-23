@@ -153,8 +153,8 @@ class Plugins(cmd.Cmd):
         self.save_plugin(plug['plugin_name'].lower(),
                          jar=pname[:-3] + 'jar',
                          bukget=plug['slug'],
-                         md5=filehash,
-                         version=version['version'],
+                         md5=plug['versions'][0]['md5'],
+                         version=plug['versions'][0]['version'],
                          enabled=True)
 
 
@@ -228,7 +228,9 @@ class Plugins(cmd.Cmd):
             'action': 'like',
             'value': s
         })
-        print '\n'.join(['%-30s [%-30s]\n\t%s\n' % (p['plugin_name'], p['slug'], p['description']) for p in results])
+        print '%-20s %-20s %s' % ('Plugin Name', 'Install Name', 'Description')
+        print '%s %s %s' % ('-' * 20, '-' * 20, '-' * 38)
+        print '\n'.join(['%-20s %-20s\n\t%s\n' % (p['plugin_name'], p['slug'], p['description']) for p in results])
 
 
     def do_list(self, s):
