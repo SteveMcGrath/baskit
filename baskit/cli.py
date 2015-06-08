@@ -9,7 +9,7 @@ import plugins
 from random import randint as random
 from server import Server
 
-__version__ = '0.2.4'
+__version__ = '0.2.99.44'
 __author__ = 'Steven McGrath'
 __email__ = 'steve@chigeek.com'
 
@@ -91,7 +91,9 @@ class BaskitCLI(cmd.Cmd):
                                     persistent storage if ramdisk support is
                                     enabled (disabled by default)
 
-        plugin                      Stuff will go here eventually.....
+        plugin                      All plugin management related functions are
+                                    housed within the plugins command.  Running
+                                    "plugin" will present it's help.
         '''
     
 

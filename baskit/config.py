@@ -28,4 +28,5 @@ max_mem         = 1024
 screen_log      = no
 terminal_out    = yes
 ramdisk         = no
+worlds          = world, world_nether, world_the_end
 '''

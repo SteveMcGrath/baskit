@@ -2,7 +2,7 @@ import cmd
 import os
 import config
 import shutil
-from bukget import api
+import bukget
 from hashlib import md5
 from ConfigParser import ConfigParser
 from zipfile import ZipFile, BadZipfile
@@ -104,7 +104,7 @@ class Plugins(cmd.Cmd):
         query BukGet to look for a match.  If we do find a match we will add
         the plugin to your list of managed plugins within baskit.
         '''
-        return api.search({
+        return bukget.search({
             'field': 'versions.md5', 
             'action': '=',
             'value': self.hash_file(filename)
@@ -129,7 +129,7 @@ class Plugins(cmd.Cmd):
         opts = list(opts)
         conf = self.get_plugin(plugin)
         if check:
-            ret = api.plugin_details(self.stype, conf['bukget'])
+            ret = bukget.plugin_details(self.stype, conf['bukget'])
             if ret is not None:
                 current = ret['versions'][0]
                 for version in ret['versions']:
@@ -143,12 +143,12 @@ class Plugins(cmd.Cmd):
         '''
         Installs or Updates a Plugin.
         '''
-        plug = api.plugin_details(self.stype, plugin, version)
+        plug = bukget.plugin_details(self.stype, plugin, version)
         if plug == None:
             print 'Not a Valid BukGet Plugin Name...'
             return
         pname = plug['versions'][0]['filename']
-        data = api.plugin_download(self.stype, plugin, version)
+        data = bukget.plugin_download(self.stype, plugin, version)
         if pname[-3:].lower() == 'jar':
             with open(os.path.join(self.plugin_path, 
                       pname[:-3] + 'jar'), 'wb') as jar:
@@ -187,7 +187,31 @@ class Plugins(cmd.Cmd):
     def help_help(self):
         print '''Plugin Management Functions 
 
-        Info will eventually go here.....
+        scan                    Scans the currently installed plugins and will add any not currently
+                                being tracked into the baskit config as well as update any version
+                                numbers for plugins that have been updated manually. 
+
+        search                  Searches for a given plugin name.
+
+        list                    Lists the currently installed plugins and their versions.  Will also 
+                                note which plugins have updates available.
+
+        update                  Will update a singular plugin (or all plugins if specified) to either
+                                current or the version specified
+
+        install                 Installs either the latest version, or the version specified.
+
+        remove                  Removes the specified plugin binary.  Please note that as many plugins
+                                will create data structures themselves, removing the plugin binary will
+                                NOT necessarially remove all fo the associated configuration and data 
+                                files.  
+
+        enable                  Enables a disabled plugin.  This will simply move the plugin binary back
+                                into the plugin folder, effectively enabling the plugin.  
+
+        disable                 Disables a plugin.  This will move the plugin binary (not any of the 
+                                associated data) into the disabled-plugins folder.  This is designed to
+                                be a non-destructive way to troubleshoot potential issues.
         '''
     
 
@@ -206,7 +230,7 @@ class Plugins(cmd.Cmd):
                     if plugin['jar'] == filename:
                         p = plugin
                 if p:
-                    plug = api.plugin_details(self.stype, p['bukget'])
+                    plug = bukget.plugin_details(self.stype, p['bukget'])
                 else:
                     plugs = self.get_plugin_info(filepath)
                     if len(plugs) == 0:
@@ -243,7 +267,7 @@ class Plugins(cmd.Cmd):
         '''search [search_string]
         Searches for a given plugin name.
         '''
-        results = api.search({
+        results = bukget.search({
             'field': 'plugin_name', 
             'action': 'like',
             'value': s
