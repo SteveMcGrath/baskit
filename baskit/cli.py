@@ -5,7 +5,6 @@ import getopt
 import os
 import datetime
 import sys
-import plugins
 from random import randint as random
 from server import Server
 
@@ -90,10 +89,6 @@ class BaskitCLI(cmd.Cmd):
         sync                        Handles syncing to/from ramdisk and
                                     persistent storage if ramdisk support is
                                     enabled (disabled by default)
-
-        plugin                      All plugin management related functions are
-                                    housed within the plugins command.  Running
-                                    "plugin" will present it's help.
         '''
     
 
@@ -267,20 +262,6 @@ class BaskitCLI(cmd.Cmd):
             Snapshot(self.server).onecmd(s)
         else:
             Snapshot(self.server).onecmd('help')
-
-
-    def do_plugin(self, s):
-        '''snapshot
-        Handles all snapshot functions including management of all snapshots.
-        For more information run:
-        
-        snapshot help
-        '''
-        msg = 'type exit to return the main console'
-        if len(s) > 1:
-            plugins.Plugins(self.server).onecmd(s)
-        else:
-            plugins.Plugins(self.server).onecmd('help')
 
 
     def do_sync(self, s):
