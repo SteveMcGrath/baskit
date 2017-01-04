@@ -3,7 +3,6 @@ import sys
 import re
 import time
 import datetime
-import bukget
 from zipfile import ZipFile
 from commands import getoutput as run
 from ConfigParser import ConfigParser
@@ -31,7 +30,6 @@ class Server(object):
     env = './'
     binary = 'server.jar'
     server_type = 'vanilla'
-    bin = 'vanilla'
     server_branch = 'stable'
     server_build = '1.0'
     worlds = []
@@ -139,8 +137,8 @@ class Server(object):
             # before we actually do anything.  Once we send the command that
             # was specified we will use the end of the file as a starting
             # point for the parsing.
-            logfile = open(os.path.join(self.env, 'env', 'server.log'), 'r')
-            size = os.stat(os.path.join(self.env, 'env', 'server.log'))[6]
+            logfile = open(os.path.join(self.env, 'env/logs', 'latest.log'), 'r')
+            size = os.stat(os.path.join(self.env, 'env/logs', 'latest.log'))[6]
             logfile.seek(size)
         
         # Sending the command to the screen session
@@ -239,6 +237,7 @@ class Server(object):
         strings = {
             'vanilla': [r'players online:', r'INFO\](.*)$'],
             'bukkit': [r'players online:', r'(.*)$'],
+            'spigot': [r'players online:', r'INFO\](.*)$'],
         }
         line = self.command('list', *strings[self.server_type])[0]
         line = line.strip('\n').strip('\x1b[m')
@@ -462,7 +461,6 @@ class Server(object):
         if not os.path.exists(path):
             os.makedirs(path)
 
-
     def _sync(self, from_path, to_path):
         '''Internal Function
         Convenience function for rsyncing.  Will use a lockfile with the
@@ -485,10 +483,3 @@ class Server(object):
         
         # Remove the lockfile
         os.remove(lockfile)
-
-
-    #def plugin_install(self, plugin, version):
-    #    '''
-    #    Installs a plugin using BukGet API.
-    #    '''
-    #    plug = api.plugin_details(self, plugin, version)
