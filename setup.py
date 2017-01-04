@@ -3,7 +3,7 @@ import sys
 
 setup(
     name='Baskit',
-    version='0.2.99.42',
+    version='0.2.99.50',
     description='Minecraft Server Manager',
     author='Steven McGrath',
     author_email='steve@chigeek.com',
@@ -16,9 +16,9 @@ setup(
     },
     #data_files=[
     #],
-    install_requires=[
-        'pyBukGet>=2.1'
-    ],
+#    install_requires=[
+#        'pyBukGet>=2.1'
+#    ],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Information Technology',
