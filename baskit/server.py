@@ -137,8 +137,8 @@ class Server(object):
             # before we actually do anything.  Once we send the command that
             # was specified we will use the end of the file as a starting
             # point for the parsing.
-            logfile = open(os.path.join(self.env, 'env', 'server.log'), 'r')
-            size = os.stat(os.path.join(self.env, 'env', 'server.log'))[6]
+            logfile = open(os.path.join(self.env, 'env/logs', 'latest.log'), 'r')
+            size = os.stat(os.path.join(self.env, 'env/logs', 'latest.log'))[6]
             logfile.seek(size)
         
         # Sending the command to the screen session
@@ -237,6 +237,7 @@ class Server(object):
         strings = {
             'vanilla': [r'players online:', r'INFO\](.*)$'],
             'bukkit': [r'players online:', r'(.*)$'],
+            'spigot': [r'players online:', r'INFO\](.*)$'],
         }
         line = self.command('list', *strings[self.server_type])[0]
         line = line.strip('\n').strip('\x1b[m')
